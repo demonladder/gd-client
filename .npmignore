@@ -1,0 +1,6 @@
+docs/
+src/
+eslint.config.mjs
+tsconfig.json
+typedoc.json
+.prettierrc

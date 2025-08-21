@@ -1,0 +1,25 @@
+enum LevelSearchType {
+    SEARCH = 0,
+    MOST_DOWNLOADED = 1,
+    MOST_LIKED = 2,
+    TRENDING = 3,
+    RECENT = 4,
+    BY_PLAYER = 5,
+    FEATURED = 6,
+    MAGIC = 7,
+    SENT_OLD = 8,
+    RATED = 10,
+    AWARDED = 11,
+    BY_ACCOUNT = 12,
+    FRIENDS = 13,
+    MOST_LIKED_WORLD = 15,
+    HALL_OF_FAME = 16,
+    FEATURED_WORLD = 17,
+    BY_ID = 19,
+    DAILY_OLD = 21,
+    WEEKLY_OLD = 22,
+    FROM_LIST = 25,
+    SENT = 27,
+}
+
+export default LevelSearchType;

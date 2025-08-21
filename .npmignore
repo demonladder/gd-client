@@ -4,3 +4,4 @@ eslint.config.mjs
 tsconfig.json
 typedoc.json
 .prettierrc
+.husky

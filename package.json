@@ -1,43 +1,45 @@
 {
-  "name": "gd-client",
-  "version": "0.1.0",
-  "description": "Client to interact with the Geometry Dash API",
-  "main": "lib/index.js",
-  "types": "lib/typings/index.d.ts",
-  "scripts": {
-    "build": "npm run lint && tsc",
-    "docgen": "typedoc --watch",
-    "lint": "eslint src",
-    "prettier": "prettier ./src --write",
-    "prepare": "husky install"
-  },
-  "dependencies": {
-    "axios": "^1.11.0"
-  },
-  "author": "DiversenSato",
-  "license": "MIT",
-  "type": "module",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/DiversenSato/gd-client.git"
-  },
-  "keywords": [
-    "geometry-dash",
-    "gd",
-    "client"
-  ],
-  "devDependencies": {
-    "@eslint/js": "^9.15.0",
-    "@types/node": "^24.3.0",
-    "eslint": "^9.33.0",
-    "prettier": "^3.6.2",
-    "rimraf": "^6.0.1",
-    "tsx": "^4.20.4",
-    "typedoc": "^0.28.10",
-    "typescript": "^5.9.2",
-    "typescript-eslint": "^8.40.0"
-  },
-  "lint-staged": {
-    "*.ts": "prettier --write"
-  }
+    "name": "gd-client",
+    "version": "0.1.0",
+    "description": "Client to interact with the Geometry Dash API",
+    "main": "lib/index.js",
+    "types": "lib/typings/index.d.ts",
+    "scripts": {
+        "build": "npm run lint && tsc",
+        "docgen": "typedoc --watch",
+        "lint": "eslint src",
+        "prettier": "prettier ./src --write",
+        "prepare": "husky install"
+    },
+    "dependencies": {
+        "axios": "^1.11.0"
+    },
+    "author": "DiversenSato",
+    "license": "MIT",
+    "type": "module",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/DiversenSato/gd-client.git"
+    },
+    "keywords": [
+        "geometry-dash",
+        "gd",
+        "client"
+    ],
+    "devDependencies": {
+        "@eslint/js": "^9.15.0",
+        "@types/node": "^24.3.0",
+        "eslint": "^9.33.0",
+        "husky": "^9.1.7",
+        "lint-staged": "^16.1.5",
+        "prettier": "^3.6.2",
+        "rimraf": "^6.0.1",
+        "tsx": "^4.20.4",
+        "typedoc": "^0.28.10",
+        "typescript": "^5.9.2",
+        "typescript-eslint": "^8.40.0"
+    },
+    "lint-staged": {
+        "*.ts": "prettier --write"
+    }
 }

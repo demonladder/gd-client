@@ -1,7 +1,7 @@
 import { Client } from '../Client';
 import { ListSearchType } from '../enums';
 import { UploadListOptions, ListClient } from '../server/ListClient';
-import { List } from '../structures/List';
+import { List } from '../structures';
 import { CachedManager } from './CachedManager';
 
 export interface ListFetchOptions {

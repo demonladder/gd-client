@@ -1,7 +1,7 @@
 import { Client } from '../Client';
 import { LevelClient } from '../server/LevelClient';
 import { LevelSearchType } from '../enums';
-import { Level } from '../structures/Level';
+import { Level } from '../structures';
 import { GDAPIError } from '../server/generic';
 import { CachedManager } from './CachedManager';
 

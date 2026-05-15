@@ -1,8 +1,7 @@
 import { CachedManager } from './CachedManager';
 import { Client } from '../Client';
-import { Level } from '../structures/Level';
+import { Comment, Level } from '../structures';
 import { LevelClient } from '../server/LevelClient';
-import { Comment } from '../structures/Comment';
 
 export class LevelCommentManager extends CachedManager<Comment> {
     public readonly levelClient: LevelClient;

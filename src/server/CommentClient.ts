@@ -2,8 +2,7 @@ import { base64Encode, chk, gjp2 } from '../util';
 import { Client } from '../Client';
 import { PaginationOptions } from '../interfaces/PaginationOptions';
 import { RequestClient } from './RequestClient';
-import { Comment } from '../structures/Comment';
-import { Post } from '../structures/Post';
+import { Comment, Post } from '../structures';
 import { KEYS, SALTS } from '../constants';
 
 export interface CommentResult {

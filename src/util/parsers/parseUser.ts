@@ -1,5 +1,5 @@
 import type { Client } from '../../Client';
-import { User } from '../../structures/User';
+import { User } from '../../structures';
 import { robTopSplit, base64Decode } from '..';
 import { parseIntAssert, parseIntUndefined } from '.';
 import type { TinyUser } from '../../types/TinyUser';

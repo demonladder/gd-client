@@ -1,5 +1,5 @@
 import { Client } from '../Client';
-import { User } from '../structures/User';
+import { User } from '../structures';
 import { RequestClient } from './RequestClient';
 import { parseMessage, parseUser, type Message } from '../util/parsers';
 import { base64Encode, xor } from '../util';

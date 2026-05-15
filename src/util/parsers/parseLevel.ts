@@ -1,6 +1,6 @@
 import type { Client } from '../../Client';
 import { KEYS } from '../../constants';
-import { Level } from '../../structures/Level';
+import { Level } from '../../structures';
 import { base64Decode, robTopSplit, xor } from '..';
 import { parseIntUndefined } from '.';
 

@@ -13,10 +13,9 @@ import {
 import { Client } from '../Client';
 import { PaginationOptions } from '../interfaces/PaginationOptions';
 import { CommentResult } from './CommentClient';
-import { Level } from '../structures/Level';
+import { Comment, Level } from '../structures';
 import { GetLevelsOptions } from '../interfaces/GetLevelsOptions';
 import { RequestClient } from './RequestClient';
-import { Comment } from '../structures/Comment';
 import { LevelSearchType } from '../enums';
 import { type TinyUser } from '../types/TinyUser';
 import { parseLevel, parseMapPack, parseSongs, parseUsers } from '../util/parsers';

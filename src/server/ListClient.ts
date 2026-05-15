@@ -1,5 +1,5 @@
 import { Client } from '../Client';
-import { List } from '../structures/List';
+import { List } from '../structures';
 import { RequestClient } from './RequestClient';
 import { ListSearchType } from '../enums';
 import { base64Encode, generateRandomString, generateUploadListSeed } from '../util';

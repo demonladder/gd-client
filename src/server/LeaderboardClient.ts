@@ -1,8 +1,7 @@
 import { Client } from '../Client';
-import { User } from '../structures/User';
+import { LeaderboardRecord, User } from '../structures';
 import { RequestClient } from './RequestClient';
 import { LeaderboardType, LevelLeaderboardType } from '../enums';
-import { LeaderboardRecord } from '../structures/LeaderboardRecord';
 import { base64Encode, chk, generatePlatformerLeaderboardSeed, generateRandomString, gjp2, xor } from '../util';
 import { parseLeaderboardRecords, parseUser } from '../util/parsers';
 import { KEYS, SALTS } from '../constants';

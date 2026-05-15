@@ -1,11 +1,12 @@
-import * as constants from '../constants.js';
-import * as utils from '../utils.js';
-import Client from '../Client.js';
-import User from '../structures/User.js';
-import RequestClient from './RequestClient.js';
+import { Client } from '../Client';
+import { User } from '../structures/User';
+import { RequestClient } from './RequestClient';
+import { parseMessage, parseUser, type Message } from '../util/parsers';
+import { base64Encode, xor } from '../util';
+import { KEYS } from '../constants';
 
 export interface GetMessagesResult {
-    messages: utils.Message[];
+    messages: Message[];
     total: number;
     offset: number;
     pageSize: number;
@@ -18,7 +19,7 @@ export interface GetFriendRequestsResponse {
     pageSize: number;
 }
 
-export default class SocialsClient extends RequestClient {
+export class SocialsClient extends RequestClient {
     public constructor(client: Client) {
         super(client);
     }
@@ -31,7 +32,7 @@ export default class SocialsClient extends RequestClient {
             type,
         });
 
-        return data.split('|').map((e) => utils.parseUser(e, this.client));
+        return data.split('|').map((e) => parseUser(e, this.client));
     }
 
     public async getMessages(page: number, type: number) {
@@ -45,7 +46,7 @@ export default class SocialsClient extends RequestClient {
         });
 
         const segments = data.split('#');
-        const messages = segments[0].split('|').map((m) => utils.parseMessage(m));
+        const messages = segments[0].split('|').map((m) => parseMessage(m));
         const pages = segments[1].split(':');
 
         return {
@@ -65,7 +66,7 @@ export default class SocialsClient extends RequestClient {
             isSender: isSender ? 1 : 0,
         });
 
-        return utils.parseMessage(data);
+        return parseMessage(data);
     }
 
     public async sendMessage(accountID: number, subject: string, body: string) {
@@ -74,8 +75,8 @@ export default class SocialsClient extends RequestClient {
         const data = await this.baseRequest('sendMessage', {
             ...this.client.auth,
             toAccountID: accountID,
-            subject: utils.base64Encode(subject),
-            body: utils.base64Encode(utils.xor(body, constants.KEYS.MESSAGES)),
+            subject: base64Encode(subject),
+            body: base64Encode(xor(body, KEYS.MESSAGES)),
         });
 
         return data;
@@ -134,7 +135,7 @@ export default class SocialsClient extends RequestClient {
         const data = await this.baseRequest('sendFriendRequest', {
             ...this.client.auth,
             toAccountID: accountID,
-            comment: utils.base64Encode(comment),
+            comment: base64Encode(comment),
         });
 
         return data;
@@ -151,7 +152,7 @@ export default class SocialsClient extends RequestClient {
         });
 
         const segments = data.split('#');
-        const friendRequests = segments[0].split('|').map((m) => utils.parseUser(m, this.client));
+        const friendRequests = segments[0].split('|').map((m) => parseUser(m, this.client));
         const pages = segments[1].split(':');
 
         return {

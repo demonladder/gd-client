@@ -1,10 +1,10 @@
-import CachedManager from './CachedManager.js';
-import Client from '../Client.js';
-import Level from '../structures/Level.js';
-import { LevelClient } from '../server/LevelClient.js';
-import Comment from '../structures/Comment.js';
+import { CachedManager } from './CachedManager';
+import { Client } from '../Client';
+import { Level } from '../structures/Level';
+import { LevelClient } from '../server/LevelClient';
+import { Comment } from '../structures/Comment';
 
-export default class LevelCommentManager extends CachedManager<Comment> {
+export class LevelCommentManager extends CachedManager<Comment> {
     public readonly levelClient: LevelClient;
 
     public constructor(

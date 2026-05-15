@@ -1,0 +1,14 @@
+import { chk } from '.';
+
+export function generateUploadListSeed(listLevels: string, accountID: string, seed2: string) {
+    if (listLevels.length < 51) return chk([listLevels], seed2, accountID);
+    let hash = '??????????????????????????????????????????????????';
+    const m = Math.floor(listLevels.length / 50);
+
+    let i = 50;
+    while (i) {
+        hash = hash.slice(0, --i) + listLevels[i * m] + hash.slice(i + 1);
+    }
+
+    return chk([hash], seed2, accountID);
+}

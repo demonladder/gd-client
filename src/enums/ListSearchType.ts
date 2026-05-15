@@ -1,4 +1,4 @@
-enum ListSearchType {
+export enum ListSearchType {
     SEARCH = 0,
     MOST_DOWNLOADS = 1,
     MOST_LIKES = 2,
@@ -12,5 +12,3 @@ enum ListSearchType {
     FRIENDS = 13,
     SENT = 27,
 }
-
-export default ListSearchType;

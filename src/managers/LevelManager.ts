@@ -1,16 +1,16 @@
-import Client from '../Client.js';
-import { LevelClient } from '../server/LevelClient.js';
-import LevelSearchType from '../enums/LevelSearchType.js';
-import Level from '../structures/Level.js';
-import { GDAPIError } from '../server/generic.js';
-import CachedManager from './CachedManager.js';
+import { Client } from '../Client';
+import { LevelClient } from '../server/LevelClient';
+import { LevelSearchType } from '../enums';
+import { Level } from '../structures/Level';
+import { GDAPIError } from '../server/generic';
+import { CachedManager } from './CachedManager';
 
 interface FetchLevelOptions {
     count?: number;
     fetchType?: LevelSearchType;
 }
 
-export default class LevelManager extends CachedManager<Level> {
+export class LevelManager extends CachedManager<Level> {
     public readonly levelClient: LevelClient;
 
     public constructor(client: Client) {

@@ -1,7 +1,6 @@
 import axios, { AxiosRequestConfig } from 'axios';
-import * as constants from '../constants.js';
-import * as utils from '../utils.js';
-import Client from '../Client.js';
+import { Client } from '../Client';
+import { DEFAULT_ACCOUNT_URL, DEFAULT_SERVER, SECRETS, VERSIONLESS_ENDPOINTS } from '../constants';
 
 export class GDAPIError extends Error {
     public constructor(
@@ -32,11 +31,11 @@ export function genericRequest<T = string>(
     axiosOptions?: AxiosRequestConfig,
 ) {
     const requestData = {
-        secret: options.secret ?? constants.SECRETS.COMMON,
+        secret: options.secret ?? SECRETS.COMMON,
         ...paramsInternal,
         ...options,
     };
-    if (!constants.VERSIONLESS_ENDPOINTS.includes(endpoint)) {
+    if (!VERSIONLESS_ENDPOINTS.includes(endpoint)) {
         requestData.gameVersion = instance.versions.gameVersion;
         requestData.binaryVersion = instance.versions.binaryVersion;
     }
@@ -44,10 +43,10 @@ export function genericRequest<T = string>(
     // else if (requestData.gameVersion == 21) requestData.gdw = 0;
     requestData.gdw = 0;
 
-    const hostElem = new URL(constants.DEFAULT_SERVER).host;
+    const hostElem = new URL(DEFAULT_SERVER).host;
 
     axios
-        .post<T>(`${constants.DEFAULT_SERVER}/${instance.endpoints[endpoint]}`, requestData, {
+        .post<T>(`${DEFAULT_SERVER}/${instance.endpoints[endpoint]}`, requestData, {
             headers: {
                 ...instance.headers,
                 Host: hostElem,
@@ -78,11 +77,11 @@ export function accountRequest<T = string>(
     axiosOptions?: AxiosRequestConfig,
 ) {
     const requestData = {
-        secret: options.secret ?? constants.SECRETS.ACCOUNT,
+        secret: options.secret ?? SECRETS.ACCOUNT,
         ...paramsInternal,
         ...options,
     };
-    if (!constants.VERSIONLESS_ENDPOINTS.includes(endpoint)) {
+    if (!VERSIONLESS_ENDPOINTS.includes(endpoint)) {
         requestData.gameVersion = instance.versions.gameVersion;
         requestData.binaryVersion = instance.versions.binaryVersion;
     }
@@ -90,11 +89,11 @@ export function accountRequest<T = string>(
     // else if (requestData.gameVersion == 21) requestData.gdw = 0;
     requestData.gdw = 0;
 
-    const hostElem = new URL(constants.DEFAULT_ACCOUNT_URL).host;
+    const hostElem = new URL(DEFAULT_ACCOUNT_URL).host;
 
     // console.log(opts)
     axios
-        .post<T>(`${constants.DEFAULT_ACCOUNT_URL}/${instance.endpoints[endpoint]}`, requestData, {
+        .post<T>(`${DEFAULT_ACCOUNT_URL}/${instance.endpoints[endpoint]}`, requestData, {
             headers: {
                 ...instance.headers,
                 Host: hostElem,
@@ -114,41 +113,4 @@ export interface ContentRequestOptions {
     gameVersion?: number;
     binaryVersion?: number;
     gdw?: number;
-}
-
-export function contentRequest<T = string>(
-    endpoint: string,
-    paramsInternal = {},
-    callbackInternal: (data: T) => void,
-    instance: Client,
-    params?: ContentRequestOptions,
-    options?: AxiosRequestConfig,
-) {
-    const expires = Math.floor(Date.now() / 1000) + 3600;
-    const opts = {
-        expires,
-        token: utils.generateCDNToken('/' + endpoint.replace(/$\//, ''), expires),
-        ...paramsInternal,
-        ...params,
-    };
-
-    const hostElem = new URL(constants.DEFAULT_CONTENT_URL).host;
-    let path = instance.endpoints[endpoint];
-    if (!path) path = endpoint;
-
-    axios
-        .get<T>(`${constants.DEFAULT_CONTENT_URL}/${path}`, {
-            headers: {
-                'User-Agent': '',
-                Host: hostElem,
-            },
-            params: opts,
-            ...options,
-        })
-        .then((res) => {
-            callbackInternal(res.data);
-        })
-        .catch((e) => {
-            throw e;
-        });
 }

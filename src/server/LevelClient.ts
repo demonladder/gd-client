@@ -1,14 +1,27 @@
-import { GenericRequestOptions } from './generic.js';
-import * as constants from '../constants.js';
-import * as utils from '../utils.js';
-import Client from '../Client.js';
-import { PaginationOptions } from '../interfaces/PaginationOptions.js';
-import { CommentResult } from './CommentClient.js';
-import Level from '../structures/Level.js';
-import GetLevelsOptions from '../interfaces/GetLevelsOptions.js';
-import RequestClient from './RequestClient.js';
-import Comment from '../structures/Comment.js';
-import LevelSearchType from '../enums/LevelSearchType.js';
+import { GenericRequestOptions } from './generic';
+import {
+    base64Encode,
+    chk,
+    generateGauntletsHash,
+    generateMapPacksHash,
+    generateRandomString,
+    generateUploadSeed2,
+    gjp2,
+    robTopSplit,
+    robTopSplitDict,
+} from '../util';
+import { Client } from '../Client';
+import { PaginationOptions } from '../interfaces/PaginationOptions';
+import { CommentResult } from './CommentClient';
+import { Level } from '../structures/Level';
+import { GetLevelsOptions } from '../interfaces/GetLevelsOptions';
+import { RequestClient } from './RequestClient';
+import { Comment } from '../structures/Comment';
+import { LevelSearchType } from '../enums';
+import { type TinyUser } from '../types/TinyUser';
+import { parseLevel, parseMapPack, parseSongs, parseUsers } from '../util/parsers';
+import type { Song } from '../types/Song';
+import { KEYS, SALTS, SECRETS } from '../constants';
 
 export interface UploadLevelOptions {
     id?: number;
@@ -36,8 +49,8 @@ export interface UploadLevelOptions {
 
 export interface GetLevelsResponse {
     levels: Level[];
-    songs?: Record<string, utils.Song>;
-    users: Record<string, utils.TinyUser>;
+    songs?: Record<string, Song>;
+    users: Record<string, TinyUser>;
     total: number;
     offset: number;
     pageSize: number;
@@ -60,7 +73,7 @@ export class LevelClient extends RequestClient {
             userName: this.client.account.username,
             levelID: opts.id ?? 0,
             levelName: opts.name,
-            levelDesc: opts.description ? utils.base64Encode(opts.description) : '',
+            levelDesc: opts.description ? base64Encode(opts.description) : '',
             unlisted: opts.unlistedMode ?? 0,
             levelVersion: opts.version ?? 1,
             requestedStars: opts.requestedStars ?? 0,
@@ -83,8 +96,8 @@ export class LevelClient extends RequestClient {
             auto: 0,
             wt: opts.editorTime ?? 0,
             wt2: opts.copiesEditorTime ?? 0,
-            seed: utils.rs(10),
-            seed2: utils.generateUploadSeed2(opts.levelString),
+            seed: generateRandomString(10),
+            seed2: generateUploadSeed2(opts.levelString),
             uuid: this.client.account.playerID,
             udid: this.client.account.udid,
         };
@@ -108,19 +121,19 @@ export class LevelClient extends RequestClient {
             inc?: number;
             chk?: string;
         } = {
-            rs: utils.rs(10),
+            rs: generateRandomString(10),
         };
 
         if (this.client.account) {
             creds.udid = this.client.account.udid;
             creds.uuid = this.client.account.playerID;
-            creds.gjp2 = utils.gjp2(this.client.account.password);
+            creds.gjp2 = gjp2(this.client.account.password);
             creds.accountID = this.client.account.accountID;
             creds.inc = Number(!!increment);
-            creds.chk = utils.chk(
+            creds.chk = chk(
                 [levelID, creds.inc, creds.rs, this.client.account.accountID, creds.udid, creds.uuid],
-                constants.KEYS.LEVEL,
-                constants.SALTS.LEVEL,
+                KEYS.LEVEL,
+                SALTS.LEVEL,
             );
             // delete params.udid
             // delete params.uuid
@@ -139,7 +152,7 @@ export class LevelClient extends RequestClient {
         const data = await this.baseRequest('downloadLevel', combinedOptions);
         const segments = data.split('#');
 
-        const level = utils.parseLevel(this.client, segments[0]);
+        const level = parseLevel(this.client, segments[0]);
 
         const hashes = segments.slice(1, 3);
         const json: DownloadLevelResponse = {
@@ -150,10 +163,10 @@ export class LevelClient extends RequestClient {
             json.unk_segment_4 = segments[3];
         }
         if (segments[4]) {
-            json.songs = utils.parseSongs(segments[4]);
+            json.songs = parseSongs(segments[4]);
         }
         if (segments[5]) {
-            json.extraArtists = utils.robTopSplitDict(segments[5], ',');
+            json.extraArtists = robTopSplitDict(segments[5], ',');
         }
 
         return json;
@@ -247,15 +260,15 @@ export class LevelClient extends RequestClient {
         const data = await this.baseRequest('getLevels', parsedOptions, params);
         const segments = data.split('#');
 
-        const levels = segments[0]?.split('|').map((l) => utils.parseLevel(this.client, l));
+        const levels = segments[0]?.split('|').map((l) => parseLevel(this.client, l));
         const users = segments[1];
-        const songs = utils.parseSongs(segments[2]);
+        const songs = parseSongs(segments[2]);
         const pages = segments[3].split(':').map(Number);
 
         return {
             levels,
             songs,
-            users: utils.parseUsers(users),
+            users: parseUsers(users),
             total: pages[0],
             offset: pages[1],
             pageSize: pages[2],
@@ -334,7 +347,7 @@ export class LevelClient extends RequestClient {
         const hash = segments[2];
         const packs = [];
         for (const pack of packsRaw) {
-            packs.push(utils.parseMapPack(pack));
+            packs.push(parseMapPack(pack));
         }
 
         return {
@@ -343,7 +356,7 @@ export class LevelClient extends RequestClient {
             offset: Number(pages[1]),
             pageSize: Number(pages[2]),
             hash,
-            isHashValid: utils.generateMapPacksHash(packs) == hash,
+            isHashValid: generateMapPacksHash(packs) == hash,
         };
     }
 
@@ -356,7 +369,7 @@ export class LevelClient extends RequestClient {
         const packs = [];
 
         for (const pack of packsRaw) {
-            const splitPack = utils.robTopSplit(pack, ':');
+            const splitPack = robTopSplit(pack, ':');
             packs.push({
                 ID: Number(splitPack.get('1')),
                 levelIDs: splitPack.get('3')!.split(',').map(Number),
@@ -366,7 +379,7 @@ export class LevelClient extends RequestClient {
         return {
             packs,
             hash,
-            isHashValid: utils.generateGauntletsHash(packs) == hash,
+            isHashValid: generateGauntletsHash(packs) == hash,
         };
     }
 
@@ -416,9 +429,9 @@ export class LevelClient extends RequestClient {
 
         return await this.baseRequest('updateDescription', {
             levelID,
-            levelDesc: utils.base64Encode(description),
+            levelDesc: base64Encode(description),
             accountID: this.client.account.accountID,
-            gjp2: utils.gjp2(this.client.account.password),
+            gjp2: gjp2(this.client.account.password),
         });
     }
 
@@ -431,10 +444,10 @@ export class LevelClient extends RequestClient {
                 levelID,
                 rating,
                 accountID: instance.account.accountID,
-                gjp2: utils.gjp2(instance.account.password),
+                gjp2: gjp2(instance.account.password),
             },
             {
-                secret: params.secret ?? constants.SECRETS.MOD,
+                secret: params.secret ?? SECRETS.MOD,
                 ...params,
             },
         );
@@ -443,22 +456,29 @@ export class LevelClient extends RequestClient {
     public async rateLevel(levelID: number, stars: number) {
         if (!this.client.account) throw new Error('You must authenticate in order to send rate suggestions for levels');
 
-        const rs = utils.rs(10);
-        const chk = utils.chk(
-            [levelID, stars, rs, this.client.account.accountID, this.client.account.udid, this.client.account.playerID],
-            constants.KEYS.RATE,
-            constants.SALTS.LIKE_OR_RATE,
+        const randomString = generateRandomString(10);
+        const chkThing = chk(
+            [
+                levelID,
+                stars,
+                randomString,
+                this.client.account.accountID,
+                this.client.account.udid,
+                this.client.account.playerID,
+            ],
+            KEYS.RATE,
+            SALTS.LIKE_OR_RATE,
         );
 
         return await this.baseRequest('rateLevel', {
             levelID,
             stars,
-            chk,
-            rs,
+            chk: chkThing,
+            rs: randomString,
             udid: this.client.account.udid,
             uuid: this.client.account.playerID,
             accountID: this.client.account.accountID,
-            gjp2: utils.gjp2(this.client.account.password),
+            gjp2: gjp2(this.client.account.password),
         });
     }
 
@@ -474,7 +494,7 @@ export class LevelClient extends RequestClient {
         const data = await this.baseRequest('deleteLevel', {
             levelID,
             accountID: this.client.account.accountID,
-            gjp2: utils.gjp2(this.client.account.password),
+            gjp2: gjp2(this.client.account.password),
         });
 
         if (data == '-1') throw new Error('-1');
@@ -495,6 +515,6 @@ export interface DownloadLevelResponse {
     level: Level;
     hashes: string[];
     unk_segment_4?: string;
-    songs?: Record<string, utils.Song>;
+    songs?: Record<string, Song>;
     extraArtists?: Record<string, string>;
 }

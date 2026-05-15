@@ -1,8 +1,8 @@
-import { genericRequest, GenericRequestOptions } from './generic.js';
-import * as constants from '../constants.js';
-import * as utils from '../utils.js';
-import Client from '../Client.js';
+import { genericRequest, GenericRequestOptions } from './generic';
+import { base64Decode, base64Encode, generateRandomString, getRandomNumber, gjp2, sha1, xor } from '../util';
+import { Client } from '../Client';
 import { AxiosRequestConfig } from 'axios';
+import { KEYS, SALTS } from '../constants';
 
 export interface GetRewardResult {
     randomString1: string;
@@ -43,24 +43,24 @@ export function getRewards(
     genericRequest(
         'getRewards',
         {
-            chk: `${utils.rs(5)}${utils.base64Encode(utils.xor(utils.getRandomNumber(10000, 1000000).toString(), constants.KEYS.CHEST_REWARDS))}`,
+            chk: `${generateRandomString(5)}${base64Encode(xor(getRandomNumber(10000, 1000000).toString(), KEYS.CHEST_REWARDS))}`,
             rewardType: type,
-            r1: utils.getRandomNumber(100, 99999),
-            r2: utils.getRandomNumber(100, 99999),
+            r1: getRandomNumber(100, 99999),
+            r2: getRandomNumber(100, 99999),
             udid: instance.account.udid,
             accountID: instance.account.accountID,
-            gjp2: utils.gjp2(instance.account.password),
+            gjp2: gjp2(instance.account.password),
         },
         function (data) {
             if (data == '-1') throw new Error('-1');
             const segments = data.split('|');
             const infoRaw = segments[0].slice(5);
-            const info = utils.xor(utils.base64Decode(infoRaw), constants.KEYS.CHEST_REWARDS).split(':');
+            const info = xor(base64Decode(infoRaw), KEYS.CHEST_REWARDS).split(':');
             const startString = segments[0].slice(0, 5);
             const small = info[6].split(',');
             const big = info[9].split(',');
             const hash = segments[1];
-            console.log(utils.xor(utils.base64Decode(infoRaw), constants.KEYS.CHEST_REWARDS));
+
             callback({
                 randomString1: startString,
                 randomString2: info[0],
@@ -86,7 +86,7 @@ export function getRewards(
                 claimedLargeChests: Number(info[10]),
                 rewardType: Number(info[11]),
                 hash,
-                isHashValid: utils.sha1(`${infoRaw}${constants.SALTS.REWARDS}`) == hash,
+                isHashValid: sha1(infoRaw + SALTS.REWARDS) == hash,
             });
         },
         instance,
@@ -124,16 +124,16 @@ export function getChallenges(
     genericRequest(
         'getChallenges',
         {
-            chk: `${utils.rs(5)}${utils.base64Encode(utils.xor(utils.getRandomNumber(10000, 1000000).toString(), constants.KEYS.CHALLENGES))}`,
+            chk: `${generateRandomString(5)}${base64Encode(xor(getRandomNumber(10000, 1000000).toString(), KEYS.CHALLENGES))}`,
             udid: instance.account.udid,
             accountID: instance.account.accountID,
-            gjp2: utils.gjp2(instance.account.password),
+            gjp2: gjp2(instance.account.password),
         },
         function (data) {
             if (data == '-1') throw new Error('-1');
             const segments = data.split('|');
             const infoRaw = segments[0].slice(5);
-            const info = utils.xor(utils.base64Decode(infoRaw), constants.KEYS.CHALLENGES).split(':');
+            const info = xor(base64Decode(infoRaw), KEYS.CHALLENGES).split(':');
             const startString = segments[0].slice(0, 5);
             const quest1 = info[6].split(',');
             const quest2 = info[7].split(',');
@@ -171,7 +171,7 @@ export function getChallenges(
                     },
                 ],
                 hash,
-                isHashValid: utils.sha1(`${infoRaw}${constants.SALTS.CHALLENGES}`) == hash,
+                isHashValid: sha1(infoRaw + SALTS.CHALLENGES) == hash,
             });
         },
         instance,

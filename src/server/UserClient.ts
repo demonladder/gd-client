@@ -1,7 +1,8 @@
-import * as constants from '../constants.js';
-import * as utils from '../utils.js';
-import Client from '../Client.js';
-import RequestClient from './RequestClient.js';
+import { Client } from '../Client';
+import { RequestClient } from './RequestClient';
+import { parseUser } from '../util/parsers';
+import { chk, generateRandomString } from '../util';
+import { KEYS, SALTS } from '../constants';
 
 /**
  * Updates your account stats.
@@ -93,7 +94,7 @@ export interface UpdateUserOptions {
     };
 }
 
-export default class UserClient extends RequestClient {
+export class UserClient extends RequestClient {
     public constructor(instance: Client) {
         super(instance);
     }
@@ -101,7 +102,7 @@ export default class UserClient extends RequestClient {
     public async searchUsers(username: string) {
         const data = await this.baseRequest('getUsers', { str: username });
         const segments = data.split('#');
-        const users = segments[0].split('|').map((u) => utils.parseUser(u, this.client));
+        const users = segments[0].split('|').map((u) => parseUser(u, this.client));
         const pages = segments[1].split(':');
 
         return {
@@ -118,7 +119,7 @@ export default class UserClient extends RequestClient {
             ...this.client.auth,
         });
 
-        return utils.parseUser(data, this.client);
+        return parseUser(data, this.client);
     }
 
     public async updateUserScore(opt: UpdateUserOptions) {
@@ -186,9 +187,9 @@ export default class UserClient extends RequestClient {
             sinfo,
             sinfod: opt.completedDailies,
             sinfog: opt.completedGauntletNonDemons,
-            seed: utils.rs(10),
+            seed: generateRandomString(10),
             // accountID, userCoins, demons, stars, coins, iconType, icon, diamonds, cube, ship, ball, ufo, wave, robot, glow, spider, deathEffect
-            seed2: utils.chk(
+            seed2: chk(
                 [
                     this.client.auth.accountID,
                     opt.userCoins,
@@ -214,8 +215,8 @@ export default class UserClient extends RequestClient {
                     opt.completedDailies,
                     opt.completedGauntletNonDemons,
                 ],
-                constants.KEYS.STAT_SUBMISSION,
-                constants.SALTS.STAT_SUBMISSION,
+                KEYS.STAT_SUBMISSION,
+                SALTS.STAT_SUBMISSION,
             ),
         });
 

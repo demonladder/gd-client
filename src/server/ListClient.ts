@@ -1,9 +1,9 @@
-import * as constants from '../constants.js';
-import * as utils from '../utils.js';
-import Client from '../Client.js';
-import List from '../structures/List.js';
-import RequestClient from './RequestClient.js';
-import ListSearchType from '../enums/ListSearchType.js';
+import { Client } from '../Client';
+import { List } from '../structures/List';
+import { RequestClient } from './RequestClient';
+import { ListSearchType } from '../enums';
+import { base64Encode, generateRandomString, generateUploadListSeed } from '../util';
+import { SECRETS } from '../constants';
 
 export interface GetListsOptions {
     query?: string;
@@ -30,7 +30,7 @@ export interface UploadListOptions {
 /**
  * This client interacts with lists through the GD API.
  */
-export default class ListClient extends RequestClient {
+export class ListClient extends RequestClient {
     public constructor(client: Client) {
         super(client);
     }
@@ -92,18 +92,18 @@ export default class ListClient extends RequestClient {
     public async uploadList(options: UploadListOptions) {
         if (!this.client.auth) throw new Error('Account not logged in');
 
-        const seed2 = utils.rs(5);
+        const seed2 = generateRandomString(5);
 
         const data = await this.baseRequest('uploadList', {
             listID: options.ID ?? 0,
             listName: options.name,
-            listDesc: options.description ? utils.base64Encode(options.description) : '',
+            listDesc: options.description ? base64Encode(options.description) : '',
             listLevels: options.levels.join(','),
             difficulty: options.difficulty ?? -1,
             original: options.originalID ?? 0,
             unlisted: options.unlistedMode ?? 0,
             listVersion: options.version ?? 0,
-            seed: utils.generateUploadListSeed(options.levels.join(','), this.client.auth.accountID.toString(), seed2),
+            seed: generateUploadListSeed(options.levels.join(','), this.client.auth.accountID.toString(), seed2),
             seed2,
             ...this.client.auth,
         });
@@ -144,7 +144,7 @@ export default class ListClient extends RequestClient {
                 ...this.client.auth,
             },
             {
-                secret: constants.SECRETS.DELETE,
+                secret: SECRETS.DELETE,
             },
         );
     }

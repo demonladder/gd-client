@@ -1,9 +1,8 @@
-import Base from '../Base.js';
-import Client from '../Client.js';
-import ContentType from '../enums/ContentType.js';
-import parseIntAssert from '../util/parsers/parseIntAssert.js';
-import parseIntUndefined from '../util/parsers/parseIntUndefined.js';
-import { robTopSplit } from '../utils.js';
+import { Base } from '../Base';
+import { Client } from '../Client';
+import { ContentType } from '../enums';
+import { parseIntAssert, parseIntUndefined } from '../util/parsers';
+import { robTopSplit } from '../util';
 
 const listKeyMap = {
     ID: '1',
@@ -26,7 +25,7 @@ const listKeyMap = {
     isFeatured: '19',
 } as const;
 
-export default class List extends Base {
+export class List extends Base {
     public readonly ID: number;
     public readonly version: number;
     public readonly playerID?: number;

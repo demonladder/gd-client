@@ -1,8 +1,8 @@
-import Client from '../Client.js';
-import Post from '../structures/Post.js';
-import CachedManager from './CachedManager.js';
+import { Client } from '../Client';
+import { Post } from '../structures/Post';
+import { CachedManager } from './CachedManager';
 
-export default class UserPostManager extends CachedManager<Post> {
+export class UserPostManager extends CachedManager<Post> {
     public constructor(client: Client) {
         super(client);
     }

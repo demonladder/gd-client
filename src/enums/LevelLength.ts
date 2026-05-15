@@ -1,7 +1,7 @@
 /**
  * This enum represents the length of a level.
  */
-enum LevelLength {
+export enum LevelLength {
     TINY = 0,
     SHORT = 1,
     MEDIUM = 2,
@@ -9,5 +9,3 @@ enum LevelLength {
     XL = 4,
     PLATFORMER = 5,
 }
-
-export default LevelLength;

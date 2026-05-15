@@ -1,7 +1,7 @@
-import Base from './Base.js';
-import Client from './Client.js';
+import { Base } from './Base';
+import { Client } from './Client';
 
-export default class Account extends Base {
+export class Account extends Base {
     public constructor(
         client: Client,
         public readonly playerID: number,

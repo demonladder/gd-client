@@ -1,4 +1,4 @@
-const sharedKeyMap = {
+export const sharedKeyMap = {
     name: '1',
     playerID: '2',
     accountID: '16',
@@ -10,5 +10,3 @@ const sharedKeyMap = {
     secretCoins: '13',
     rank: '6',
 } as const;
-
-export default sharedKeyMap;

@@ -1,11 +1,10 @@
-import Base from '../Base.js';
-import Client from '../Client.js';
-import ClassProperties from '../types/ClassProperties.js';
-import LevelLength from '../enums/LevelLength.js';
-import LevelCommentManager from '../managers/LevelCommentManager.js';
-import ContentType from '../enums/ContentType.js';
+import { Base } from '../Base';
+import { Client } from '../Client';
+import { ClassProperties } from '../types/ClassProperties';
+import { ContentType, LevelLength } from '../enums';
+import { LevelCommentManager } from '../managers/LevelCommentManager';
 
-export default class Level extends Base {
+export class Level extends Base {
     public readonly ID: number;
     public readonly levelString?: string;
     public readonly version: number;

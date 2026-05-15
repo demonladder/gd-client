@@ -1,4 +1,4 @@
-enum LevelSearchType {
+export enum LevelSearchType {
     SEARCH = 0,
     MOST_DOWNLOADED = 1,
     MOST_LIKED = 2,
@@ -21,5 +21,3 @@ enum LevelSearchType {
     FROM_LIST = 25,
     SENT = 27,
 }
-
-export default LevelSearchType;

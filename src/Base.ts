@@ -1,6 +1,6 @@
-import Client from './Client.js';
+import { Client } from './Client';
 
-export default abstract class Base {
+export abstract class Base {
     public constructor(public readonly client: Client) {}
 
     public abstract toJSON(): object;

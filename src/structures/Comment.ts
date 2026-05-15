@@ -1,9 +1,8 @@
-import Base from '../Base.js';
-import Client from '../Client.js';
-import ContentType from '../enums/ContentType.js';
-import parseIntAssert from '../util/parsers/parseIntAssert.js';
-import parseIntUndefined from '../util/parsers/parseIntUndefined.js';
-import { base64Decode, robTopSplit } from '../utils.js';
+import { Base } from '../Base';
+import { Client } from '../Client';
+import { ContentType } from '../enums';
+import { base64Decode, robTopSplit } from '../util';
+import { parseIntAssert, parseIntUndefined } from '../util/parsers';
 
 const userCommentKeyMap = {
     levelID: '1',
@@ -18,7 +17,7 @@ const userCommentKeyMap = {
     textColor: '12', // Optional
 } as const;
 
-export default class Comment extends Base {
+export class Comment extends Base {
     public readonly ID: number;
     public readonly levelID: number;
     public readonly playerID: number;

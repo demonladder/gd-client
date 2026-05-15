@@ -1,7 +1,4 @@
-export default function remapKeys<T>(
-    obj: Map<string, T>,
-    keyMap: Record<string, string>,
-): Record<string, T | undefined> {
+export function remapKeys<T>(obj: Map<string, T>, keyMap: Record<string, string>): Record<string, T | undefined> {
     const newObj = {} as Record<string, T | undefined>;
 
     for (const [key, value] of obj.entries()) {

@@ -1,8 +1,8 @@
 import axios from 'axios';
-import Base from '../Base.js';
-import { DEFAULT_SERVER, SECRETS, VERSIONLESS_ENDPOINTS } from '../constants.js';
-import Client from '../Client.js';
-import { GDAPIError } from './generic.js';
+import { Base } from '../Base';
+import { DEFAULT_SERVER, SECRETS, VERSIONLESS_ENDPOINTS } from '../constants';
+import { Client } from '../Client';
+import { GDAPIError } from './generic';
 
 export interface RequestOptions {
     secret?: string;
@@ -11,7 +11,7 @@ export interface RequestOptions {
 /**
  * Super class that directly handles requests to the Geometry Dash servers.
  */
-export default class RequestClient extends Base {
+export class RequestClient extends Base {
     private readonly axios = axios.create({
         baseURL: DEFAULT_SERVER,
     });

@@ -1,8 +1,10 @@
-import { genericRequest, accountRequest, GenericRequestOptions, AccountRequestOptions } from './generic.js';
-import * as constants from '../constants.js';
-import * as utils from '../utils.js';
-import Client from '../Client.js';
-import { AxiosRequestConfig } from 'axios';
+import type { AxiosRequestConfig } from 'axios';
+import { genericRequest, accountRequest, type GenericRequestOptions, type AccountRequestOptions } from './generic';
+import { Client } from '../Client';
+import { SECRETS } from '../constants';
+import type { MapPack } from '../types/MapPack';
+import { base64DecodeBuffer, gjp2, robTopSplitDict, tryUnzip } from '../util';
+import { parseMapPack } from '../util/parsers';
 
 export function registerAccount(
     username: string,
@@ -44,7 +46,7 @@ export function registerAccount(
         },
         instance,
         {
-            secret: secret ?? constants.SECRETS.ACCOUNT,
+            secret: secret ?? SECRETS.ACCOUNT,
             ...params,
         },
         options,
@@ -108,7 +110,7 @@ export function requestModAccess(
         'requestModAccess',
         {
             accountID: instance.account.accountID,
-            gjp2: utils.gjp2(instance.account.password),
+            gjp2: gjp2(instance.account.password),
         },
         function (data) {
             if (data == '-1') callback(false);
@@ -116,7 +118,7 @@ export function requestModAccess(
         },
         instance,
         {
-            secret: params.secret ?? constants.SECRETS.ACCOUNT,
+            secret: params.secret ?? SECRETS.ACCOUNT,
             ...params,
         },
         options,
@@ -129,7 +131,7 @@ export interface SaveData {
     gameVersion: number;
     binaryVersion: number;
     ratedLevels: Record<string, number>;
-    mappacks: utils.MapPack[];
+    mappacks: MapPack[];
 }
 
 export function loadSaveData(
@@ -143,16 +145,14 @@ export function loadSaveData(
         'loadSaveData',
         {
             accountID: instance.account.accountID,
-            gjp2: utils.gjp2(instance.account.password),
+            gjp2: gjp2(instance.account.password),
             uuid: instance.account.playerID,
             udid: instance.account.udid,
         },
         function (data) {
             const elements = data.split(';');
-            const ratedLevels = utils.robTopSplitDict(
-                utils
-                    .tryUnzip(utils.base64DecodeBuffer(elements[4].slice(20, elements[4].length - 20)))
-                    .toString('utf8'),
+            const ratedLevels = robTopSplitDict(
+                tryUnzip(base64DecodeBuffer(elements[4].slice(20, elements[4].length - 20))).toString('utf8'),
                 ',',
             );
             const parsedRatedLevels: Record<string, number> = {};
@@ -166,11 +166,10 @@ export function loadSaveData(
                 gameVersion: Number(elements[2]),
                 binaryVersion: Number(elements[3]),
                 ratedLevels: parsedRatedLevels,
-                mappacks: utils
-                    .tryUnzip(utils.base64DecodeBuffer(mappacks.slice(20, mappacks.length - 20)))
+                mappacks: tryUnzip(base64DecodeBuffer(mappacks.slice(20, mappacks.length - 20)))
                     .toString('utf8')
                     .split('|')
-                    .map((m) => utils.parseMapPack(m)),
+                    .map((m) => parseMapPack(m)),
             });
         },
         instance,
@@ -192,7 +191,7 @@ export function backupSaveData(
         'backupSaveData',
         {
             accountID: instance.account.accountID,
-            gjp2: utils.gjp2(instance.account.password),
+            gjp2: gjp2(instance.account.password),
             uuid: instance.account.playerID,
             udid: instance.account.udid,
             saveData: `${gameManager};${localLevels}`,
@@ -225,7 +224,7 @@ export function getAccountURL(
         },
         instance,
         {
-            secret: params.secret ?? constants.SECRETS.ACCOUNT,
+            secret: params.secret ?? SECRETS.ACCOUNT,
             ...params,
         },
         options,

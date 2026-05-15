@@ -1,7 +1,7 @@
-import Base from '../Base.js';
-import Client from '../Client.js';
+import { Base } from '../Base';
+import { Client } from '../Client';
 
-export default abstract class CachedManager<T extends Base> extends Base {
+export abstract class CachedManager<T extends Base> extends Base {
     public readonly cache = new Map<number, T>();
 
     public constructor(client: Client) {

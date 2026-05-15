@@ -1,8 +1,8 @@
-import Client from '../Client.js';
-import ListSearchType from '../enums/ListSearchType.js';
-import ListClient, { UploadListOptions } from '../server/ListClient.js';
-import List from '../structures/List.js';
-import CachedManager from './CachedManager.js';
+import { Client } from '../Client';
+import { ListSearchType } from '../enums';
+import { UploadListOptions, ListClient } from '../server/ListClient';
+import { List } from '../structures/List';
+import { CachedManager } from './CachedManager';
 
 export interface ListFetchOptions {
     query?: string;
@@ -12,7 +12,7 @@ export interface ListFetchOptions {
     rated?: boolean;
 }
 
-export default class ListManager extends CachedManager<List> {
+export class ListManager extends CachedManager<List> {
     private readonly listClient = new ListClient(this.client);
 
     public constructor(client: Client) {

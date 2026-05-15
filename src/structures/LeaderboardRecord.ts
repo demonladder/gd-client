@@ -1,7 +1,7 @@
-import Base from '../Base.js';
-import Client from '../Client.js';
+import { Base } from '../Base';
+import { Client } from '../Client';
 
-export default class LeaderboardRecord extends Base {
+export class LeaderboardRecord extends Base {
     public constructor(
         client: Client,
         public readonly name: string,

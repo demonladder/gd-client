@@ -1,13 +1,15 @@
-import { genericRequest, GenericRequestOptions } from './generic.js';
-import * as utils from '../utils.js';
-import Client from '../Client.js';
+import { genericRequest, GenericRequestOptions } from './generic';
+import { Client } from '../Client';
 import { AxiosRequestConfig } from 'axios';
+import { type Artist } from '../types/Artist';
+import { type Song } from '../types/Song';
+import { parseArtists, parseSongs } from '../util/parsers';
 
 export function getSongInfo(
     songID: number,
     instance: Client,
     params: GenericRequestOptions = {},
-    callback: (song: utils.Song) => void,
+    callback: (song: Song) => void,
     options?: AxiosRequestConfig,
 ) {
     genericRequest(
@@ -15,7 +17,7 @@ export function getSongInfo(
         { songID },
         function (data) {
             if (data == '-1') throw new Error('Song not found');
-            const d = utils.parseSongs(data);
+            const d = parseSongs(data);
             callback(d[songID] || d);
         },
         instance,
@@ -25,7 +27,7 @@ export function getSongInfo(
 }
 
 export interface ArtistResult {
-    artists: utils.Artist[];
+    artists: Artist[];
     total: number;
     offset: number;
     pageSize: number;
@@ -43,7 +45,7 @@ export function getTopArtists(
         { page },
         function (d) {
             const data = d.split('#');
-            const artists = utils.parseArtists(data[0]);
+            const artists = parseArtists(data[0]);
             const pageInfo = data[1].split(':');
             callback({
                 artists,

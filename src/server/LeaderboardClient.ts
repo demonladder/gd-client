@@ -1,14 +1,13 @@
-import * as constants from '../constants.js';
-import * as utils from '../utils.js';
-import Client from '../Client.js';
-import User from '../structures/User.js';
-import RequestClient from './RequestClient.js';
-import LeaderboardType from '../enums/LeaderboardType.js';
-import LevelLeaderboardType from '../enums/LevelLeaderboardType.js';
-import LeaderboardRecord from '../structures/LeaderboardRecord.js';
-import parseLeaderboardRecords from '../util/parsers/parseLeaderboardRecords.js';
+import { Client } from '../Client';
+import { User } from '../structures/User';
+import { RequestClient } from './RequestClient';
+import { LeaderboardType, LevelLeaderboardType } from '../enums';
+import { LeaderboardRecord } from '../structures/LeaderboardRecord';
+import { base64Encode, chk, generatePlatformerLeaderboardSeed, generateRandomString, gjp2, xor } from '../util';
+import { parseLeaderboardRecords, parseUser } from '../util/parsers';
+import { KEYS, SALTS } from '../constants';
 
-export default class LeaderboardClient extends RequestClient {
+export class LeaderboardClient extends RequestClient {
     public constructor(client: Client) {
         super(client);
     }
@@ -17,7 +16,7 @@ export default class LeaderboardClient extends RequestClient {
         const data = await this.baseRequest('getLeaderboards', { type });
         const dr = data.split('|');
         const d = dr.filter((e) => !!e);
-        const users = d.map((u) => utils.parseUser(u, this.client));
+        const users = d.map((u) => parseUser(u, this.client));
 
         return {
             users,
@@ -73,7 +72,7 @@ export default class LeaderboardClient extends RequestClient {
         const s1 = (opts.attempts ?? 0) + 8354;
         const s2 = (opts.bestAttemptClicks ?? 0) + 3991;
         const s3 = bestAttemptTime + 4085;
-        const s4 = utils.generatePlatformerLeaderboardSeed(opts.time ?? 0, opts.points ?? 0);
+        const s4 = generatePlatformerLeaderboardSeed(opts.time ?? 0, opts.points ?? 0);
         let s6 = '0';
         if (opts.percentages)
             s6 = opts.percentages
@@ -84,7 +83,7 @@ export default class LeaderboardClient extends RequestClient {
                 })
                 .join(',');
 
-        const s7 = utils.rs(10);
+        const s7 = generateRandomString(10);
         const s9 = (opts.coins ?? 0) + 5819;
 
         // accountID,levelID,percentage,bestAttemptTime,bestAttemptClicks,attempts,levelSeed,pbDiffs,1,coins,timelyID
@@ -101,7 +100,7 @@ export default class LeaderboardClient extends RequestClient {
             opts.coins ?? 0,
             opts.timelyID ?? 0,
         ];
-        const chk = utils.chk(values, constants.KEYS.LEVEL_LEADERBOARD, constants.SALTS.LEVEL_LEADERBOARDS + s7);
+        const _chk = chk(values, KEYS.LEVEL_LEADERBOARD, SALTS.LEVEL_LEADERBOARDS + s7);
         const percentage = opts.percentage ?? 0;
         if (s6 == '0') s6 = percentage.toString();
 
@@ -116,15 +115,15 @@ export default class LeaderboardClient extends RequestClient {
             s3,
             s4: s4 + 1482,
             s5: 2000 + Math.floor(Math.random() * 1999),
-            s6: utils.base64Encode(utils.xor(s6, constants.KEYS.LEVEL)),
+            s6: base64Encode(xor(s6, KEYS.LEVEL)),
             s7,
             s8: opts.attempts ?? 0,
             s9,
             s10: opts.timelyID ?? 0,
             levelID,
-            chk,
+            chk: _chk,
             accountID: this.client.account?.accountID,
-            gjp2: utils.gjp2(this.client.account?.password ?? ''),
+            gjp2: gjp2(this.client.account?.password ?? ''),
             uuid: this.client.account?.playerID,
             udid: this.client.account?.udid,
             percent: percentage ? percentage : undefined,
@@ -133,7 +132,7 @@ export default class LeaderboardClient extends RequestClient {
         const data = await this.baseRequest('getPlatformerLevelLeaderboards', parsedOptions);
         if (!data) throw new Error('No data returned');
 
-        const scores = data.split('|').map((u) => utils.parseUser(u, this.client)) as (User & {
+        const scores = data.split('|').map((u) => parseUser(u, this.client)) as (User & {
             time?: number;
             points?: number;
         })[];

@@ -1,7 +1,6 @@
-import LevelLength from '../enums/LevelLength.js';
-import LevelSearchType from '../enums/LevelSearchType.js';
+import { LevelLength, LevelSearchType } from '../enums';
 
-interface GetLevelsOptions {
+export interface GetLevelsOptions {
     query?: string;
     type?: LevelSearchType;
     count?: number;
@@ -27,5 +26,3 @@ interface GetLevelsOptions {
     playerID?: number;
     listID?: number;
 }
-
-export default GetLevelsOptions;

@@ -1,8 +1,8 @@
-import { robTopSplit } from '../../utils.js';
-import levelLeaderboardKeyMap from './keyMaps/leaderboard/levelLeaderboardKeyMap.js';
-import parseIntAssert from './parseIntAssert.js';
+import { levelLeaderboardKeyMap } from '.';
+import { parseIntAssert } from '.';
+import { robTopSplit } from '..';
 
-export default function parseLeaderboardRecords(str: string) {
+export function parseLeaderboardRecords(str: string) {
     const raw = robTopSplit(str, ':');
 
     if (!raw.get(levelLeaderboardKeyMap.name)) throw new Error('Parsing error: Leaderboard record name is missing.');

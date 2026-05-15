@@ -1,10 +1,10 @@
-import * as constants from '../constants.js';
-import * as utils from '../utils.js';
-import Client from '../Client.js';
-import { PaginationOptions } from '../interfaces/PaginationOptions.js';
-import RequestClient from './RequestClient.js';
-import Comment from '../structures/Comment.js';
-import Post from '../structures/Post.js';
+import { base64Encode, chk, gjp2 } from '../util';
+import { Client } from '../Client';
+import { PaginationOptions } from '../interfaces/PaginationOptions';
+import { RequestClient } from './RequestClient';
+import { Comment } from '../structures/Comment';
+import { Post } from '../structures/Post';
+import { KEYS, SALTS } from '../constants';
 
 export interface CommentResult {
     comments: Comment[];
@@ -25,7 +25,7 @@ interface CommentOptions extends PaginationOptions {
     mode?: CommentMode;
 }
 
-export default class CommentClient extends RequestClient {
+export class CommentClient extends RequestClient {
     public constructor(client: Client) {
         super(client);
     }
@@ -59,16 +59,16 @@ export default class CommentClient extends RequestClient {
         if (!this.client.account) throw new Error('You must authenticate in order to do this');
 
         return await this.baseRequest('uploadAccountComment', {
-            comment: utils.base64Encode(content),
+            comment: base64Encode(content),
             ...this.client.auth,
             cType: 1,
             ...(this.client.account.username
                 ? {
                       userName: this.client.account.username,
-                      chk: utils.chk(
-                          [this.client.account.username, utils.base64Encode(content), 0, 0, 1],
-                          constants.KEYS.COMMENT,
-                          constants.SALTS.COMMENT,
+                      chk: chk(
+                          [this.client.account.username, base64Encode(content), 0, 0, 1],
+                          KEYS.COMMENT,
+                          SALTS.COMMENT,
                       ),
                   }
                 : {}),
@@ -81,7 +81,7 @@ export default class CommentClient extends RequestClient {
             commentID: ID,
             targetAccountID: accountID ?? this.client.account.accountID,
             accountID: this.client.account.accountID,
-            gjp2: utils.gjp2(this.client.account.password),
+            gjp2: gjp2(this.client.account.password),
         });
 
         if (data == '1') {
@@ -93,19 +93,19 @@ export default class CommentClient extends RequestClient {
 
     public async uploadComment(levelID: number, content: string, percent: number) {
         if (!this.client.account) throw new Error('You must authenticate in order to do this');
-        const chk = utils.chk(
-            [this.client.account.username, utils.base64Encode(content), levelID, percent, 0],
-            constants.KEYS.COMMENT,
-            constants.SALTS.COMMENT,
+        const chkThing = chk(
+            [this.client.account.username, base64Encode(content), levelID, percent, 0],
+            KEYS.COMMENT,
+            SALTS.COMMENT,
         );
 
         return await this.baseRequest('uploadComment', {
             levelID,
-            comment: utils.base64Encode(content),
+            comment: base64Encode(content),
             percent,
-            gjp2: utils.gjp2(this.client.account.password),
+            gjp2: gjp2(this.client.account.password),
             accountID: this.client.account.accountID,
-            chk,
+            chk: chkThing,
             userName: this.client.account.username,
         });
     }

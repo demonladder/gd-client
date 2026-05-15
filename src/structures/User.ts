@@ -1,8 +1,8 @@
-import Base from '../Base.js';
-import Client from '../Client.js';
-import UserPostManager from '../managers/UserPostManager.js';
+import { Base } from '../Base';
+import { Client } from '../Client';
+import { UserPostManager } from '../managers/UserPostManager';
 
-export default class User extends Base {
+export class User extends Base {
     public readonly posts = new UserPostManager(this.client);
 
     public constructor(

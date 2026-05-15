@@ -1,9 +1,7 @@
-import sharedKeyMap from './shared.js';
+import { sharedKeyMap } from './shared';
 
-const levelLeaderboardKeyMap = {
+export const levelLeaderboardKeyMap = {
     ...sharedKeyMap,
     percent: '3',
     age: '42',
 } as const;
-
-export default levelLeaderboardKeyMap;

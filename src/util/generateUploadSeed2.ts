@@ -1,0 +1,13 @@
+import { KEYS, SALTS } from '../constants';
+import { chk } from '.';
+
+export function generateUploadSeed2(levelString: string) {
+    if (levelString.length < 51) return chk([levelString], KEYS.LEVEL, SALTS.LEVEL);
+    let hash = '??????????????????????????????????????????????????';
+    const m = Math.floor(levelString.length / 50);
+    let i = 50;
+    while (i) {
+        hash = hash.slice(0, --i) + levelString[i * m] + hash.slice(i + 1);
+    }
+    return chk([hash], KEYS.LEVEL, SALTS.LEVEL);
+}

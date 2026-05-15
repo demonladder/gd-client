@@ -1,6 +1,6 @@
-import sharedKeyMap from './shared.js';
+import { sharedKeyMap } from './shared';
 
-const scoresUserKeyMap = {
+export const scoresUserKeyMap = {
     ...sharedKeyMap,
     demons: '4',
     stars: '3',
@@ -9,5 +9,3 @@ const scoresUserKeyMap = {
     userCoins: '17',
     creatorPoints: '8',
 } as const;
-
-export default scoresUserKeyMap;

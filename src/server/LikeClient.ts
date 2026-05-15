@@ -1,10 +1,10 @@
-import * as constants from '../constants.js';
-import * as utils from '../utils.js';
-import Client from '../Client.js';
-import RequestClient from './RequestClient.js';
-import ContentType from '../enums/ContentType.js';
+import { Client } from '../Client';
+import { RequestClient } from './RequestClient';
+import { ContentType } from '../enums';
+import { chk, generateRandomString } from '../util';
+import { KEYS, SALTS } from '../constants';
 
-export default class LikeClient extends RequestClient {
+export class LikeClient extends RequestClient {
     public constructor(client: Client) {
         super(client);
     }
@@ -13,20 +13,20 @@ export default class LikeClient extends RequestClient {
         if (!this.client.auth || !this.client.account)
             throw new Error('You must authenticate in order to like/dislike items');
 
-        const rs = utils.rs(10);
-        const chk = utils.chk(
+        const randomString = generateRandomString(10);
+        const chkThing = chk(
             [
                 special,
                 itemID,
                 like,
                 type,
-                rs,
+                randomString,
                 this.client.auth.accountID,
                 this.client.account.udid,
                 this.client.account.playerID,
             ],
-            constants.KEYS.RATE,
-            constants.SALTS.LIKE_OR_RATE,
+            KEYS.RATE,
+            SALTS.LIKE_OR_RATE,
         );
 
         const data = await this.baseRequest('likeItem', {
@@ -34,8 +34,8 @@ export default class LikeClient extends RequestClient {
             special,
             type,
             like,
-            chk,
-            rs,
+            chk: chkThing,
+            rs: randomString,
             udid: this.client.account.udid,
             uuid: this.client.account.playerID,
             ...this.client.auth,

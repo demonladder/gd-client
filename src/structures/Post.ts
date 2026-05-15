@@ -1,7 +1,7 @@
-import Base from '../Base.js';
-import Client from '../Client.js';
-import parseIntAssert from '../util/parsers/parseIntAssert.js';
-import { base64Decode, robTopSplit } from '../utils.js';
+import { Base } from '../Base';
+import { Client } from '../Client';
+import { base64Decode, robTopSplit } from '../util';
+import { parseIntAssert } from '../util/parsers';
 
 const postKeyMap = {
     content: '2',
@@ -10,7 +10,7 @@ const postKeyMap = {
     age: '9',
 } as const;
 
-export default class Post extends Base {
+export class Post extends Base {
     public readonly ID: number;
     public readonly content: string;
     public readonly likes: number;

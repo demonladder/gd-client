@@ -2,13 +2,14 @@
     "name": "gd-client",
     "version": "0.1.0",
     "description": "Client to interact with the Geometry Dash API",
-    "types": "typings/index.d.ts",
+    "types": "./lib/index.d.ts",
     "exports": {
         ".": "./lib/index.js",
         "./util": "./lib/util/index.js"
     },
     "scripts": {
         "build": "npm run lint && tsc",
+        "clean": "rimraf lib",
         "docgen": "typedoc --watch",
         "lint": "eslint src",
         "prettier": "prettier ./src --write",

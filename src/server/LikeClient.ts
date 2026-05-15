@@ -29,7 +29,7 @@ export class LikeClient extends RequestClient {
             SALTS.LIKE_OR_RATE,
         );
 
-        const data = await this.baseRequest('likeItem', {
+        return await this.baseRequest('likeItem', {
             itemID,
             special,
             type,
@@ -40,7 +40,5 @@ export class LikeClient extends RequestClient {
             uuid: this.client.account.playerID,
             ...this.client.auth,
         });
-
-        return data;
     }
 }

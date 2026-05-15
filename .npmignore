@@ -1,7 +1,11 @@
+.husky/
+.VSCodeCounter/
 docs/
 src/
+.npmrc
+.prettierrc
+bun.lock
 eslint.config.mjs
+knip.json
 tsconfig.json
 typedoc.json
-.prettierrc
-.husky

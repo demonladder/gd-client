@@ -12,9 +12,11 @@
         "noUnusedParameters": true,
         "noUnusedLocals": true,
 
+        "rootDir": "./src",
         "outDir": "lib",
         "declarationDir": "typings",
         "declaration": true,
+        "types": ["bun"]
     },
     "include": [
         "src/**/*",

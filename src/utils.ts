@@ -541,7 +541,8 @@ const levelOldBoolKeys = {
 } as const;
 
 export interface LevelOldMetaData
-    extends Record<(typeof levelOldNumberKeys)[keyof typeof levelOldNumberKeys], number | undefined>,
+    extends
+        Record<(typeof levelOldNumberKeys)[keyof typeof levelOldNumberKeys], number | undefined>,
         Record<(typeof levelOldStringKeys)[keyof typeof levelOldStringKeys], string | undefined>,
         Record<(typeof levelOldBoolKeys)[keyof typeof levelOldBoolKeys], boolean | undefined> {
     description?: string;
@@ -558,7 +559,7 @@ export interface LevelOld {
     levelString?: string;
 }
 
-export function parseLevelOld(str: string) {
+export function parseLevelOld(str: string): LevelOld {
     const level: Partial<LevelOldMetaData> = {};
 
     const raw = robTopSplit(str, ':');
@@ -602,7 +603,7 @@ export function parseLevelOld(str: string) {
         parsedAt: date,
     };
     if (levelString) value.levelString = levelString;
-    return value as LevelOld;
+    return value;
 }
 
 export function parseUser(str: string, client: Client, sep = ':'): User {
@@ -725,7 +726,8 @@ const messageBoolKeys = {
 } as const;
 
 export interface Message
-    extends Record<(typeof messageNumberKeys)[keyof typeof messageNumberKeys], number | undefined>,
+    extends
+        Record<(typeof messageNumberKeys)[keyof typeof messageNumberKeys], number | undefined>,
         Record<(typeof messageStringKeys)[keyof typeof messageStringKeys], string | undefined>,
         Record<(typeof messageBoolKeys)[keyof typeof messageBoolKeys], boolean | undefined> {}
 

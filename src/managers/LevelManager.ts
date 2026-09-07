@@ -19,7 +19,7 @@ export class LevelManager extends CachedManager<Level> {
         this.levelClient = new LevelClient(client);
     }
 
-    public async fetch(options?: number): Promise<Level>;
+    public async fetch(levelId?: number): Promise<Level>;
     public async fetch(options?: FetchLevelOptions): Promise<Level[]>;
     public async fetch(options?: FetchLevelOptions | number): Promise<Level[] | Level> {
         if (typeof options === 'number') {
@@ -29,13 +29,10 @@ export class LevelManager extends CachedManager<Level> {
                     return cacheHit;
                 }
 
-                const result = await this.levelClient.getLevels({
-                    query: options.toString(),
-                    type: LevelSearchType.BY_ID,
-                });
+                const result = await this.levelClient.download(options);
 
-                this.cache.set(result.levels[0].ID, result.levels[0]);
-                return result.levels[0];
+                this.cache.set(result.level.ID, result.level);
+                return result.level;
             } catch (err) {
                 if (err instanceof GDAPIError) {
                     if (err.code === -1) throw new Error('Level not found');

@@ -5,7 +5,7 @@ import { Level } from '../structures';
 import { GdApiError } from '../types/gdApiError';
 import { CachedManager } from './CachedManager';
 
-interface FetchLevelOptions {
+export interface FetchLevelOptions {
     count?: number;
     fetchType?: LevelSearchType;
 }

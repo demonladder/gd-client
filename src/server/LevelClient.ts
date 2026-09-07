@@ -47,14 +47,11 @@ export interface UploadLevelOptions {
 
 export interface GetLevelsResponse {
     levels: Level[];
-    songs?: Record<string, Song>;
-    users: Record<string, TinyUser>;
+    songs: Record<string, Song>;
+    users: TinyUser[];
     total: number;
     offset: number;
     pageSize: number;
-    hash: string;
-    isHashValid: boolean;
-    date: number;
 }
 
 export class LevelClient extends RequestClient {
@@ -104,7 +101,7 @@ export class LevelClient extends RequestClient {
         return ID;
     }
 
-    public async download(levelID: number, increment = false) {
+    public async download(levelID: number, increment = false): Promise<DownloadLevelResponse> {
         const opt = {
             levelID,
         };
@@ -186,7 +183,7 @@ export class LevelClient extends RequestClient {
      * Gets levels from a Geometry Dash server.
      * @param {object} opts The options for the request
      */
-    public async getLevels(opts: GetLevelsOptions, params: RequestOptions = {}) {
+    public async getLevels(opts: GetLevelsOptions, params: RequestOptions = {}): Promise<GetLevelsResponse> {
         const diffMap = {
             '-1': -3,
             0: -1,
@@ -363,7 +360,7 @@ export class LevelClient extends RequestClient {
         const segments = data.split('#');
         const packsRaw = segments[0].split('|');
         const hash = segments[1];
-        const packs = [];
+        const packs: GauntletPack[] = [];
 
         for (const pack of packsRaw) {
             const splitPack = robTopSplit(pack, ':');

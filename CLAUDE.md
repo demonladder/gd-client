@@ -55,7 +55,7 @@ GD returns `#`-delimited segments of `key:value:key:value` strings. Parsing live
 
 ## Conventions
 
-- **Barrel files, no default exports, no `import *`** (enforced by convention since commit `7bc9a65`). Every folder with an `index.ts` re-exports its members; new files must be added to the relevant barrel and, if public, to `src/index.ts`.
+- **Barrel files, no default exports, no `import *`** (enforced by convention since commit `7bc9a65`). Every source folder has an `index.ts` re-exporting its members, and `src/index.ts` is nothing but `export *` over those barrels plus `Base`/`Client`/`Account`. Adding a file therefore means adding one line to its folder's barrel — that is the whole step; anything exported from the file becomes public. Keep internal imports on the concrete module path (`'../server/RequestClient'`, not `'../server'`) to avoid import cycles.
 - `@typescript-eslint/explicit-member-accessibility` is an error — every class member needs `public`/`private`/`protected`.
 - `@typescript-eslint/no-floating-promises` is an error; `noUnusedLocals`/`noUnusedParameters` are on (prefix intentionally unused with `_`).
 - Prettier: 4 spaces, single quotes, 120 columns.

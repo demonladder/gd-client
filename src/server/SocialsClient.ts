@@ -35,7 +35,7 @@ export class SocialsClient extends RequestClient {
         return data.split('|').map((e) => parseUser(e, this.client));
     }
 
-    public async getMessages(page: number, type: number) {
+    public async getMessages(page: number, type: number): Promise<GetMessagesResult> {
         const { auth } = this.requireAuth('get messages');
 
         const data = await this.baseRequest('getMessages', {
@@ -141,7 +141,7 @@ export class SocialsClient extends RequestClient {
         return data;
     }
 
-    public async getFriendRequests(page: number, type: number) {
+    public async getFriendRequests(page: number, type: number): Promise<GetFriendRequestsResponse> {
         const { auth } = this.requireAuth('get friend requests');
 
         const data = await this.baseRequest('getFriendRequests', {

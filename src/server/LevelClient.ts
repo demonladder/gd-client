@@ -1,4 +1,3 @@
-import { GenericRequestOptions } from './generic';
 import {
     base64Encode,
     chk,
@@ -15,7 +14,7 @@ import { PaginationOptions } from '../interfaces/PaginationOptions';
 import { CommentResult } from './CommentClient';
 import { Comment, Level } from '../structures';
 import { GetLevelsOptions } from '../interfaces/GetLevelsOptions';
-import { RequestClient } from './RequestClient';
+import { RequestClient, type RequestOptions } from './RequestClient';
 import { LevelSearchType } from '../enums';
 import { type TinyUser } from '../types/TinyUser';
 import { parseLevel, parseMapPack, parseSongs, parseUsers } from '../util/parsers';
@@ -187,7 +186,7 @@ export class LevelClient extends RequestClient {
      * Gets levels from a Geometry Dash server.
      * @param {object} opts The options for the request
      */
-    public async getLevels(opts: GetLevelsOptions, params: GenericRequestOptions = {}) {
+    public async getLevels(opts: GetLevelsOptions, params: RequestOptions = {}) {
         const diffMap = {
             '-1': -3,
             0: -1,
@@ -338,7 +337,7 @@ export class LevelClient extends RequestClient {
         return await this.getLevels({ type: 27 });
     }
 
-    public async getMapPacks(params: GenericRequestOptions & { page?: number } = {}) {
+    public async getMapPacks(params: RequestOptions & { page?: number } = {}) {
         const data = await this.baseRequest('getMapPacks', {}, params);
         const segments = data.split('#');
         const packsRaw = segments[0].split('|');
@@ -434,7 +433,7 @@ export class LevelClient extends RequestClient {
         });
     }
 
-    public async rateDemon(levelID: number, rating: number, instance: Client, params: GenericRequestOptions = {}) {
+    public async rateDemon(levelID: number, rating: number, instance: Client, params: RequestOptions = {}) {
         if (!instance.account) throw new Error('You must authenticate in order to send rate suggestions for levels');
 
         return await this.baseRequest(

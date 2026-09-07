@@ -2,7 +2,7 @@ import { Client } from '../Client';
 import { LevelClient } from '../server/LevelClient';
 import { LevelSearchType } from '../enums';
 import { Level } from '../structures';
-import { GDAPIError } from '../server/generic';
+import { GdApiError } from '../types/gdApiError';
 import { CachedManager } from './CachedManager';
 
 interface FetchLevelOptions {
@@ -34,7 +34,7 @@ export class LevelManager extends CachedManager<Level> {
                 this.cache.set(result.level.ID, result.level);
                 return result.level;
             } catch (err) {
-                if (err instanceof GDAPIError) {
+                if (err instanceof GdApiError) {
                     if (err.code === -1) throw new Error('Level not found');
                 }
 

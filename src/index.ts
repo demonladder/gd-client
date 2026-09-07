@@ -1,5 +1,6 @@
 export { Client } from './Client';
 export { Account } from './Account';
+export { AccountClient, type LoginAccountResult, type SaveData } from './server/AccountClient';
 export { CommentMode, type CommentResult, CommentClient } from './server/CommentClient';
 export type { PaginationOptions } from './interfaces/PaginationOptions';
 export { UserClient } from './server/UserClient';
@@ -17,4 +18,6 @@ export { LeaderboardClient } from './server/LeaderboardClient';
 export type { GetListsOptions, UploadListOptions } from './server/ListClient';
 export { ListManager, type ListFetchOptions } from './managers/ListManager';
 export { LikeClient } from './server/LikeClient';
+export { RewardClient, type GetRewardResult, type GetChallengesResult } from './server/RewardClient';
 export { SocialsClient } from './server/SocialsClient';
+export { SongClient, type ArtistResult } from './server/SongClient';

@@ -2,29 +2,17 @@ import { LeaderboardType } from './enums';
 import { CommentClient } from './server/CommentClient';
 import { UserClient } from './server/UserClient';
 import { SocialsClient } from './server/SocialsClient';
-import { type Song } from './types/Song';
 import { gjp2 } from './util';
 import { GetPlatformerLevelScoresOptions, LeaderboardClient } from './server/LeaderboardClient';
-import { GenericRequestOptions } from './server/generic';
-import { AxiosRequestConfig } from 'axios';
 import { Account } from './Account';
 import { LevelManager } from './managers/LevelManager';
 import { Version } from './interfaces/Version';
 import { LikeClient } from './server/LikeClient';
 import { ListManager } from './managers/ListManager';
-import { getChallenges, getRewards, type GetChallengesResult, type GetRewardResult } from './server/rewards';
+import { RewardClient } from './server/RewardClient';
 import { DEFAULT_HEADERS_22, DefaultEndpoints } from './constants';
-import { getSongInfo, getTopArtists, type ArtistResult } from './server/songs';
-import {
-    backupSaveData,
-    getAccountURL,
-    loadSaveData,
-    loginAccount,
-    registerAccount,
-    requestModAccess,
-    type LoginAccountResult,
-    type SaveData,
-} from './server/accounts';
+import { SongClient } from './server/SongClient';
+import { AccountClient } from './server/AccountClient';
 
 export class Client {
     public versions: Version = {
@@ -32,12 +20,15 @@ export class Client {
         binaryVersion: 42,
     };
     public account?: Account;
+    public readonly accountClient = new AccountClient(this);
     public readonly comments = new CommentClient(this);
     public readonly leaderboardClient = new LeaderboardClient(this);
     public readonly levels = new LevelManager(this);
     public readonly likeClient = new LikeClient(this);
     public readonly lists = new ListManager(this);
+    public readonly rewards = new RewardClient(this);
     public readonly socialsClient = new SocialsClient(this);
+    public readonly songs = new SongClient(this);
     public readonly users = new UserClient(this);
     public auth?: { accountID: number; gjp2: string };
 
@@ -58,43 +49,20 @@ export class Client {
         return this.likeClient.likeItem(postID, accountID, 3, like ? 1 : 0);
     }
 
-    public getSongInfo(
-        songID: number,
-        callback: (data: Song) => void,
-        params?: GenericRequestOptions,
-        options?: AxiosRequestConfig,
-    ) {
-        getSongInfo(songID, this, params, callback, options);
+    public async getSongInfo(songID: number) {
+        return await this.songs.getSongInfo(songID);
     }
 
-    public getTopArtists(
-        page: number,
-        callback: (data: ArtistResult) => void,
-        params?: GenericRequestOptions,
-        options?: AxiosRequestConfig,
-    ) {
-        getTopArtists(page, this, params, callback, options);
+    public async getTopArtists(page: number) {
+        return await this.songs.getTopArtists(page);
     }
 
-    public registerAccount(
-        username: string,
-        email: string,
-        password: string,
-        callback: (isSuccess: boolean) => void,
-        params?: GenericRequestOptions,
-        options?: AxiosRequestConfig,
-    ) {
-        registerAccount(username, email, password, this, params, callback, options);
+    public async registerAccount(username: string, email: string, password: string) {
+        return await this.accountClient.registerAccount(username, email, password);
     }
 
-    public loginAccount(
-        username: string,
-        password: string,
-        callback: (data: LoginAccountResult) => void,
-        params?: GenericRequestOptions,
-        options?: AxiosRequestConfig,
-    ) {
-        loginAccount(username, password, this, params, callback, options);
+    public async loginAccount(username: string, password: string) {
+        return await this.accountClient.loginAccount(username, password);
     }
 
     public async getGlobalStarLeaderboards() {
@@ -113,28 +81,16 @@ export class Client {
         return await this.leaderboardClient.getLeaderboards(LeaderboardType.CREATORS);
     }
 
-    public getDailyChests(
-        callback: (data: GetRewardResult) => void,
-        params?: GenericRequestOptions,
-        options?: AxiosRequestConfig,
-    ) {
-        getRewards(0, this, params, callback, options);
+    public async getDailyChests() {
+        return await this.rewards.getRewards(0);
     }
 
-    public getQuests(
-        callback: (data: GetChallengesResult) => void,
-        params?: GenericRequestOptions,
-        options?: AxiosRequestConfig,
-    ) {
-        getChallenges(this, params, callback, options);
+    public async getQuests() {
+        return await this.rewards.getChallenges();
     }
 
-    public requestModAccess(
-        callback: (data: string | false) => void,
-        params?: GenericRequestOptions,
-        options?: AxiosRequestConfig,
-    ) {
-        requestModAccess(this, params, callback, options);
+    public async requestModAccess() {
+        return await this.accountClient.requestModAccess();
     }
 
     public async getUserList(type: number) {
@@ -149,22 +105,12 @@ export class Client {
         return await this.socialsClient.getUserList(1);
     }
 
-    public loadSaveData(
-        callback: (data: SaveData) => void,
-        params?: GenericRequestOptions,
-        options?: AxiosRequestConfig,
-    ) {
-        loadSaveData(this, params, callback, options);
+    public async loadSaveData() {
+        return await this.accountClient.loadSaveData();
     }
 
-    public backupSaveData(
-        gameManager: string,
-        localLevels: string,
-        callback: (data: string) => void,
-        params?: GenericRequestOptions,
-        options?: AxiosRequestConfig,
-    ) {
-        backupSaveData(gameManager, localLevels, this, params, callback, options);
+    public async backupSaveData(gameManager: string, localLevels: string) {
+        return await this.accountClient.backupSaveData(gameManager, localLevels);
     }
 
     public async getMessages(page: number, type: number) {
@@ -231,29 +177,16 @@ export class Client {
         return await this.socialsClient.removeFriend(targetAccountID);
     }
 
-    public getAccountURL(
-        type: number,
-        callback: (data: string | false) => void,
-        params?: GenericRequestOptions,
-        options?: AxiosRequestConfig,
-    ) {
-        getAccountURL(type, this, params, callback, options);
+    public async getAccountURL(type: number) {
+        return await this.accountClient.getAccountURL(type);
     }
 
-    public getBackupAccountURL(
-        callback: (data: string | false) => void,
-        params?: GenericRequestOptions,
-        options?: AxiosRequestConfig,
-    ) {
-        getAccountURL(1, this, params, callback, options);
+    public async getBackupAccountURL() {
+        return await this.accountClient.getAccountURL(1);
     }
 
-    public getSyncAccountURL(
-        callback: (data: string | false) => void,
-        params?: GenericRequestOptions,
-        options?: AxiosRequestConfig,
-    ) {
-        getAccountURL(2, this, params, callback, options);
+    public async getSyncAccountURL() {
+        return await this.accountClient.getAccountURL(2);
     }
 
     public async getLevelScores(levelID: number, type: number) {
@@ -275,11 +208,14 @@ export class Client {
             headers: this.headers,
             versions: this.versions,
             account: this.account?.toJSON(),
+            accountClient: this.accountClient.toJSON(),
             comments: this.comments.toJSON(),
             levels: this.levels.toJSON(),
             likeClient: this.likeClient.toJSON(),
             lists: this.lists.toJSON(),
+            rewards: this.rewards.toJSON(),
             socialsClient: this.socialsClient.toJSON(),
+            songs: this.songs.toJSON(),
             users: this.users.toJSON(),
         };
     }

@@ -2,10 +2,15 @@ import axios from 'axios';
 import { Base } from '../Base';
 import { DEFAULT_SERVER, SECRETS, VERSIONLESS_ENDPOINTS } from '../constants';
 import { Client } from '../Client';
-import { GDAPIError } from './generic';
+import { GdApiError } from '../types/gdApiError';
 
 export interface RequestOptions {
     secret?: string;
+    /**
+     * The server to send the request to. A few endpoints — account login, backup and sync — live
+     * on `DEFAULT_ACCOUNT_URL` rather than `DEFAULT_SERVER`, which is the default.
+     */
+    server?: string;
 }
 
 /**
@@ -21,7 +26,7 @@ export class RequestClient extends Base {
     }
 
     /**
-     * @throws {GDAPIError | axios.AxiosError} This method can throw errors from the API or from axios.
+     * @throws A {@link GdApiError} or an AxiosError.
      * @param endpoint
      * @param paramsInternal
      * @param options
@@ -32,18 +37,20 @@ export class RequestClient extends Base {
         paramsInternal: Record<string, string | number | undefined> = {},
         options?: RequestOptions,
     ): Promise<T> {
+        const { server = DEFAULT_SERVER, ...bodyOptions } = options ?? {};
+
         const requestData: Record<string, string | number> = {
-            secret: options?.secret ?? SECRETS.COMMON,
+            secret: bodyOptions.secret ?? SECRETS.COMMON,
             gdw: 0,
             ...paramsInternal,
-            ...options,
+            ...bodyOptions,
         };
         if (!VERSIONLESS_ENDPOINTS.includes(endpoint)) {
             requestData.gameVersion = this.client.versions.gameVersion;
             requestData.binaryVersion = this.client.versions.binaryVersion;
         }
 
-        const url = new URL(`${DEFAULT_SERVER}/${this.client.endpoints[endpoint]}`);
+        const url = new URL(`${server}/${this.client.endpoints[endpoint]}`);
 
         const res = await this.axios.post<T>(url.toString(), requestData, {
             headers: {
@@ -53,7 +60,7 @@ export class RequestClient extends Base {
         });
 
         if (res.data === -1 || (typeof res.data === 'string' && parseInt(res.data) === -1))
-            throw new GDAPIError('API request failed. Response: -1', -1);
+            throw new GdApiError('API request failed. Response: -1', -1);
 
         return res.data;
     }

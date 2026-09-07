@@ -69,9 +69,7 @@ export class ListClient extends RequestClient {
             str = options.accountID.toString();
         }
 
-        if (options.type === ListSearchType.FRIENDS) {
-            if (!this.client.auth) throw new Error('Must be authorized to get friend levels');
-        }
+        const friendsAuth = options.type === ListSearchType.FRIENDS ? this.requireAuth('get friend lists').auth : {};
 
         const parsedOpts = {
             str,
@@ -81,7 +79,7 @@ export class ListClient extends RequestClient {
             type: options.type ?? 2,
             followed: options.accountIDs ? options.accountIDs.join(',') : '',
             ...diff,
-            ...(options.type === ListSearchType.FRIENDS ? this.client.auth : {}),
+            ...friendsAuth,
         };
 
         const data = await this.baseRequest('getLists', parsedOpts);
@@ -90,7 +88,7 @@ export class ListClient extends RequestClient {
     }
 
     public async uploadList(options: UploadListOptions) {
-        if (!this.client.auth) throw new Error('Account not logged in');
+        const { auth } = this.requireAuth('upload a list');
 
         const seed2 = generateRandomString(5);
 
@@ -103,9 +101,9 @@ export class ListClient extends RequestClient {
             original: options.originalID ?? 0,
             unlisted: options.unlistedMode ?? 0,
             listVersion: options.version ?? 0,
-            seed: generateUploadListSeed(options.levels.join(','), this.client.auth.accountID.toString(), seed2),
+            seed: generateUploadListSeed(options.levels.join(','), auth.accountID.toString(), seed2),
             seed2,
-            ...this.client.auth,
+            ...auth,
         });
 
         if (Number(data) < 0) {
@@ -135,13 +133,13 @@ export class ListClient extends RequestClient {
     }
 
     public async deleteList(ID: number) {
-        if (!this.client.auth) throw new Error('Account not logged in');
+        const { auth } = this.requireAuth('delete a list');
 
         return await this.baseRequest(
             'deleteList',
             {
                 listID: ID,
-                ...this.client.auth,
+                ...auth,
             },
             {
                 secret: SECRETS.DELETE,

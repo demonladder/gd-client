@@ -5,7 +5,6 @@ import {
     generateMapPacksHash,
     generateRandomString,
     generateUploadSeed2,
-    gjp2,
     robTopSplit,
     robTopSplitDict,
 } from '../util';
@@ -16,6 +15,7 @@ import { Comment, Level } from '../structures';
 import { GetLevelsOptions } from '../interfaces/GetLevelsOptions';
 import { RequestClient, type RequestOptions } from './RequestClient';
 import { LevelSearchType } from '../enums';
+import { AuthenticationError } from '../types/AuthenticationError';
 import { type TinyUser } from '../types/TinyUser';
 import { parseLevel, parseMapPack, parseSongs, parseUsers } from '../util/parsers';
 import type { Song } from '../types/Song';
@@ -63,12 +63,11 @@ export class LevelClient extends RequestClient {
     }
 
     public async upload(opts: UploadLevelOptions) {
-        if (!this.client.auth || !this.client.account)
-            throw new Error('You must authenticate in order to upload a level');
+        const { auth, account } = this.requireAuth('upload a level');
 
         const parsedOptions = {
-            ...this.client.auth,
-            userName: this.client.account.username,
+            ...auth,
+            userName: account.username,
             levelID: opts.id ?? 0,
             levelName: opts.name,
             levelDesc: opts.description ? base64Encode(opts.description) : '',
@@ -96,8 +95,8 @@ export class LevelClient extends RequestClient {
             wt2: opts.copiesEditorTime ?? 0,
             seed: generateRandomString(10),
             seed2: generateUploadSeed2(opts.levelString),
-            uuid: this.client.account.playerID,
-            udid: this.client.account.udid,
+            uuid: account.playerID,
+            udid: account.udid,
         };
 
         const ID = await this.baseRequest('uploadLevel', parsedOptions);
@@ -122,14 +121,15 @@ export class LevelClient extends RequestClient {
             rs: generateRandomString(10),
         };
 
-        if (this.client.account) {
-            creds.udid = this.client.account.udid;
-            creds.uuid = this.client.account.playerID;
-            creds.gjp2 = gjp2(this.client.account.password);
-            creds.accountID = this.client.account.accountID;
+        const { auth, account } = this.client;
+        if (auth && account) {
+            creds.udid = account.udid;
+            creds.uuid = account.playerID;
+            creds.gjp2 = auth.gjp2;
+            creds.accountID = auth.accountID;
             creds.inc = Number(!!increment);
             creds.chk = chk(
-                [levelID, creds.inc, creds.rs, this.client.account.accountID, creds.udid, creds.uuid],
+                [levelID, creds.inc, creds.rs, auth.accountID, creds.udid, creds.uuid],
                 KEYS.LEVEL,
                 SALTS.LEVEL,
             );
@@ -141,7 +141,7 @@ export class LevelClient extends RequestClient {
             // delete params.rs
             // delete params.gjp
             // delete params.accountID
-        } else if (increment) throw new Error('Must authenticate with an account to increment');
+        } else if (increment) throw new AuthenticationError("increment a level's download count");
 
         const combinedOptions = {
             ...opt,
@@ -224,9 +224,8 @@ export class LevelClient extends RequestClient {
             str = opts.levelIDs.join(',');
         else if (opts.type == LevelSearchType.FROM_LIST && opts.listID) str = opts.listID.toString();
 
-        if (opts.type == LevelSearchType.FRIENDS) {
-            if (!this.client.account) throw new Error('Must be authorized to get friend levels');
-        }
+        const friendsAuth =
+            opts.type == LevelSearchType.FRIENDS ? this.requireAuth('get friend levels').auth : this.client.auth;
 
         const parsedOptions: Record<string, string | number> = {
             page: opts.page ?? 0,
@@ -249,7 +248,7 @@ export class LevelClient extends RequestClient {
             customSong: opts.customSong ?? 0,
             song: opts.songID ?? 0,
             demonFilter: diff.demonFilter ?? 0,
-            ...this.client.auth,
+            ...friendsAuth,
         };
 
         if (diff.diff) parsedOptions.diff = diff.diff;
@@ -423,26 +422,24 @@ export class LevelClient extends RequestClient {
     }
 
     public async updateDescription(levelID: number, description: string) {
-        if (!this.client.account) throw new Error("You must authenticate in order to update a level's description");
+        const { auth } = this.requireAuth("update a level's description");
 
         return await this.baseRequest('updateDescription', {
             levelID,
             levelDesc: base64Encode(description),
-            accountID: this.client.account.accountID,
-            gjp2: gjp2(this.client.account.password),
+            ...auth,
         });
     }
 
     public async rateDemon(levelID: number, rating: number, instance: Client, params: RequestOptions = {}) {
-        if (!instance.account) throw new Error('You must authenticate in order to send rate suggestions for levels');
+        if (!instance.auth) throw new AuthenticationError('send rate suggestions for levels');
 
         return await this.baseRequest(
             'rateDemon',
             {
                 levelID,
                 rating,
-                accountID: instance.account.accountID,
-                gjp2: gjp2(instance.account.password),
+                ...instance.auth,
             },
             {
                 secret: params.secret ?? SECRETS.MOD,
@@ -452,18 +449,11 @@ export class LevelClient extends RequestClient {
     }
 
     public async rateLevel(levelID: number, stars: number) {
-        if (!this.client.account) throw new Error('You must authenticate in order to send rate suggestions for levels');
+        const { auth, account } = this.requireAuth('rate a level');
 
         const randomString = generateRandomString(10);
         const chkThing = chk(
-            [
-                levelID,
-                stars,
-                randomString,
-                this.client.account.accountID,
-                this.client.account.udid,
-                this.client.account.playerID,
-            ],
+            [levelID, stars, randomString, auth.accountID, account.udid, account.playerID],
             KEYS.RATE,
             SALTS.LIKE_OR_RATE,
         );
@@ -473,10 +463,9 @@ export class LevelClient extends RequestClient {
             stars,
             chk: chkThing,
             rs: randomString,
-            udid: this.client.account.udid,
-            uuid: this.client.account.playerID,
-            accountID: this.client.account.accountID,
-            gjp2: gjp2(this.client.account.password),
+            udid: account.udid,
+            uuid: account.playerID,
+            ...auth,
         });
     }
 
@@ -487,12 +476,11 @@ export class LevelClient extends RequestClient {
     }
 
     public async delete(levelID: number) {
-        if (!this.client.account) throw new Error('You must authenticate in order to delete a level');
+        const { auth } = this.requireAuth('delete a level');
 
         const data = await this.baseRequest('deleteLevel', {
             levelID,
-            accountID: this.client.account.accountID,
-            gjp2: gjp2(this.client.account.password),
+            ...auth,
         });
 
         if (data == '-1') throw new Error('-1');

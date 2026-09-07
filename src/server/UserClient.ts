@@ -123,7 +123,7 @@ export class UserClient extends RequestClient {
     }
 
     public async updateUserScore(opt: UpdateUserOptions) {
-        if (!this.client.auth) throw new Error('Must authenticate with account');
+        const { auth } = this.requireAuth('update your score');
 
         const demons = opt.demons || opt.completedDemons.length;
         const dinfo = opt.completedDemons.join(',');
@@ -157,7 +157,7 @@ export class UserClient extends RequestClient {
         }
 
         const data = await this.baseRequest('updateUserScore', {
-            ...this.client.auth,
+            ...auth,
             stars: opt.stars,
             demons,
             moons: opt.moons,
@@ -191,7 +191,7 @@ export class UserClient extends RequestClient {
             // accountID, userCoins, demons, stars, coins, iconType, icon, diamonds, cube, ship, ball, ufo, wave, robot, glow, spider, deathEffect
             seed2: chk(
                 [
-                    this.client.auth.accountID,
+                    auth.accountID,
                     opt.userCoins,
                     demons,
                     opt.stars,
@@ -238,9 +238,9 @@ export class UserClient extends RequestClient {
         twitch: string;
         twitter: string;
     }) {
-        if (!this.client.auth) throw new Error('Must authenticate with account');
+        const { auth } = this.requireAuth('update your account settings');
         const data = await this.accountRequest('updateAccountSettings', {
-            ...this.client.auth,
+            ...auth,
             mS,
             frS,
             cS,

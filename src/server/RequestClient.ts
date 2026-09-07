@@ -2,6 +2,9 @@ import axios from 'axios';
 import { Base } from '../Base';
 import { DEFAULT_SERVER, SECRETS, VERSIONLESS_ENDPOINTS } from '../constants';
 import { Client } from '../Client';
+import { Account } from '../Account';
+import { AuthCredentials } from '../interfaces/AuthCredentials';
+import { AuthenticationError } from '../types/AuthenticationError';
 import { GdApiError } from '../types/gdApiError';
 
 export interface RequestOptions {
@@ -11,6 +14,17 @@ export interface RequestOptions {
      * on `DEFAULT_ACCOUNT_URL` rather than `DEFAULT_SERVER`, which is the default.
      */
     server?: string;
+}
+
+export interface AuthContext {
+    /**
+     * `accountID` and `gjp2`, ready to be spread into a request body.
+     */
+    auth: AuthCredentials;
+    /**
+     * The logged in account, for the endpoints that also want `udid`, `uuid` or `userName`.
+     */
+    account: Account;
 }
 
 /**
@@ -63,6 +77,21 @@ export class RequestClient extends Base {
             throw new GdApiError('API request failed. Response: -1', -1);
 
         return res.data;
+    }
+
+    /**
+     * Resolves the credentials {@link Client.login} stored, for the endpoints that require them.
+     * `Client.account` and `Client.auth` are only ever set together, so this covers both.
+     *
+     * @throws {AuthenticationError} Throws if the client has not logged in.
+     * @param action What the caller is about to do, used to build the error message.
+     * @returns
+     */
+    protected requireAuth(action: string): AuthContext {
+        const { auth, account } = this.client;
+        if (!auth || !account) throw new AuthenticationError(action);
+
+        return { auth, account };
     }
 
     protected accountRequest<T = string>(

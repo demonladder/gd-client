@@ -1,6 +1,6 @@
 import { Client } from '../Client';
 import { RequestClient } from './RequestClient';
-import { base64Decode, base64Encode, generateRandomString, getRandomNumber, gjp2, sha1, xor } from '../util';
+import { base64Decode, base64Encode, generateRandomString, getRandomNumber, sha1, xor } from '../util';
 import { KEYS, SALTS } from '../constants';
 
 export interface GetRewardResult {
@@ -81,13 +81,12 @@ export class RewardClient extends RequestClient {
     }
 
     /**
-     * @throws If the client is not logged in.
+     * @throws {AuthenticationError} Throws if the client has not logged in.
      * @param type
      * @returns
      */
     public async getRewards(type: number): Promise<GetRewardResult> {
-        const account = this.client.account;
-        if (!account) throw new Error('Account not logged in');
+        const { auth, account } = this.requireAuth('get rewards');
 
         const data = await this.baseRequest('getRewards', {
             chk: generateRewardChk(KEYS.CHEST_REWARDS),
@@ -95,8 +94,7 @@ export class RewardClient extends RequestClient {
             r1: getRandomNumber(100, 99999),
             r2: getRandomNumber(100, 99999),
             udid: account.udid,
-            accountID: account.accountID,
-            gjp2: gjp2(account.password),
+            ...auth,
         });
 
         const { startString, info, hash, isHashValid } = decodeRewardResponse(data, KEYS.CHEST_REWARDS, SALTS.REWARDS);
@@ -133,18 +131,16 @@ export class RewardClient extends RequestClient {
     }
 
     /**
-     * @throws If the client is not logged in.
+     * @throws {AuthenticationError} Throws if the client has not logged in.
      * @returns
      */
     public async getChallenges(): Promise<GetChallengesResult> {
-        const account = this.client.account;
-        if (!account) throw new Error('Account not logged in');
+        const { auth, account } = this.requireAuth('get challenges');
 
         const data = await this.baseRequest('getChallenges', {
             chk: generateRewardChk(KEYS.CHALLENGES),
             udid: account.udid,
-            accountID: account.accountID,
-            gjp2: gjp2(account.password),
+            ...auth,
         });
 
         const { startString, info, hash, isHashValid } = decodeRewardResponse(data, KEYS.CHALLENGES, SALTS.CHALLENGES);

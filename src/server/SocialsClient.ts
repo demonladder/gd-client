@@ -25,10 +25,10 @@ export class SocialsClient extends RequestClient {
     }
 
     public async getUserList(type: number) {
-        if (!this.client.auth) throw new Error('Must authenticate with account');
+        const { auth } = this.requireAuth('get a user list');
 
         const data = await this.baseRequest('getUserList', {
-            ...this.client.auth,
+            ...auth,
             type,
         });
 
@@ -36,10 +36,10 @@ export class SocialsClient extends RequestClient {
     }
 
     public async getMessages(page: number, type: number) {
-        if (!this.client.auth) throw new Error('Must authenticate with account');
+        const { auth } = this.requireAuth('get messages');
 
         const data = await this.baseRequest('getMessages', {
-            ...this.client.auth,
+            ...auth,
             page,
             getSent: type,
             total: 0,
@@ -58,10 +58,10 @@ export class SocialsClient extends RequestClient {
     }
 
     public async readMessage(messageID: number, isSender: boolean) {
-        if (!this.client.auth) throw new Error('Must authenticate with account');
+        const { auth } = this.requireAuth('read a message');
 
         const data = await this.baseRequest('readMessage', {
-            ...this.client.auth,
+            ...auth,
             messageID,
             isSender: isSender ? 1 : 0,
         });
@@ -70,10 +70,10 @@ export class SocialsClient extends RequestClient {
     }
 
     public async sendMessage(accountID: number, subject: string, body: string) {
-        if (!this.client.auth) throw new Error('Must authenticate with account');
+        const { auth } = this.requireAuth('send a message');
 
         const data = await this.baseRequest('sendMessage', {
-            ...this.client.auth,
+            ...auth,
             toAccountID: accountID,
             subject: base64Encode(subject),
             body: base64Encode(xor(body, KEYS.MESSAGES)),
@@ -83,10 +83,10 @@ export class SocialsClient extends RequestClient {
     }
 
     public async deleteMessage(id: number, isSender: boolean) {
-        if (!this.client.auth) throw new Error('Must authenticate with account');
+        const { auth } = this.requireAuth('delete a message');
 
         const data = await this.baseRequest('deleteMessage', {
-            ...this.client.auth,
+            ...auth,
             messageID: id,
             isSender: Number(!!isSender),
         });
@@ -95,10 +95,10 @@ export class SocialsClient extends RequestClient {
     }
 
     public async blockUser(accountID: number) {
-        if (!this.client.auth) throw new Error('Must authenticate with account');
+        const { auth } = this.requireAuth('block a user');
 
         const data = await this.baseRequest('blockUser', {
-            ...this.client.auth,
+            ...auth,
             targetAccountID: accountID,
         });
 
@@ -106,10 +106,10 @@ export class SocialsClient extends RequestClient {
     }
 
     public async unblockUser(accountID: number) {
-        if (!this.client.auth) throw new Error('Must authenticate with account');
+        const { auth } = this.requireAuth('unblock a user');
 
         const data = await this.baseRequest('unblockUser', {
-            ...this.client.auth,
+            ...auth,
             targetAccountID: accountID,
         });
 
@@ -117,10 +117,10 @@ export class SocialsClient extends RequestClient {
     }
 
     public async deleteFriendRequests(accountIDs: number | number[], isSender: boolean) {
-        if (!this.client.auth) throw new Error('Must authenticate with account');
+        const { auth } = this.requireAuth('delete friend requests');
 
         const data = await this.baseRequest('deleteFriendRequests', {
-            ...this.client.auth,
+            ...auth,
             targetAccountID: typeof accountIDs == 'number' ? accountIDs : 0,
             ...(Array.isArray(accountIDs) ? { accounts: accountIDs.join(',') } : {}),
             isSender: isSender ? 1 : 0,
@@ -130,10 +130,10 @@ export class SocialsClient extends RequestClient {
     }
 
     public async sendFriendRequest(accountID: number, comment: string) {
-        if (!this.client.auth) throw new Error('Must authenticate with account');
+        const { auth } = this.requireAuth('send a friend request');
 
         const data = await this.baseRequest('sendFriendRequest', {
-            ...this.client.auth,
+            ...auth,
             toAccountID: accountID,
             comment: base64Encode(comment),
         });
@@ -142,10 +142,10 @@ export class SocialsClient extends RequestClient {
     }
 
     public async getFriendRequests(page: number, type: number) {
-        if (!this.client.auth) throw new Error('Must authenticate with account');
+        const { auth } = this.requireAuth('get friend requests');
 
         const data = await this.baseRequest('getFriendRequests', {
-            ...this.client.auth,
+            ...auth,
             page,
             getSent: type,
             total: 0,
@@ -164,10 +164,10 @@ export class SocialsClient extends RequestClient {
     }
 
     public async readFriendRequest(requestID: number) {
-        if (!this.client.auth) throw new Error('Must authenticate with account');
+        const { auth } = this.requireAuth('read a friend request');
 
         const data = await this.baseRequest('readFriendRequest', {
-            ...this.client.auth,
+            ...auth,
             requestID,
         });
 
@@ -175,10 +175,10 @@ export class SocialsClient extends RequestClient {
     }
 
     public async acceptFriendRequest(requestID: number, targetAccountID: number) {
-        if (!this.client.auth) throw new Error('Must authenticate with account');
+        const { auth } = this.requireAuth('accept a friend request');
 
         const data = await this.baseRequest('acceptFriendRequest', {
-            ...this.client.auth,
+            ...auth,
             requestID,
             targetAccountID,
         });
@@ -187,10 +187,10 @@ export class SocialsClient extends RequestClient {
     }
 
     public async removeFriend(targetAccountID: number) {
-        if (!this.client.auth) throw new Error('Must authenticate with account');
+        const { auth } = this.requireAuth('remove a friend');
 
         const data = await this.baseRequest('removeFriend', {
-            ...this.client.auth,
+            ...auth,
             targetAccountID,
         });
 

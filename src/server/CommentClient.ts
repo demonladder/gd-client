@@ -1,4 +1,4 @@
-import { base64Encode, chk, gjp2 } from '../util';
+import { base64Encode, chk } from '../util';
 import { Client } from '../Client';
 import { PaginationOptions } from '../interfaces/PaginationOptions';
 import { RequestClient } from './RequestClient';
@@ -55,32 +55,27 @@ export class CommentClient extends RequestClient {
     }
 
     public async uploadProfilePost(content: string) {
-        if (!this.client.account) throw new Error('You must authenticate in order to do this');
+        const { auth, account } = this.requireAuth('upload a profile post');
 
         return await this.baseRequest('uploadAccountComment', {
             comment: base64Encode(content),
-            ...this.client.auth,
+            ...auth,
             cType: 1,
-            ...(this.client.account.username
+            ...(account.username
                 ? {
-                      userName: this.client.account.username,
-                      chk: chk(
-                          [this.client.account.username, base64Encode(content), 0, 0, 1],
-                          KEYS.COMMENT,
-                          SALTS.COMMENT,
-                      ),
+                      userName: account.username,
+                      chk: chk([account.username, base64Encode(content), 0, 0, 1], KEYS.COMMENT, SALTS.COMMENT),
                   }
                 : {}),
         });
     }
 
     public async deleteProfilePost(ID: number, accountID?: number) {
-        if (!this.client.account) throw new Error('You must authenticate in order to do this');
+        const { auth } = this.requireAuth('delete a profile post');
         const data = await this.baseRequest('deleteAccountComment', {
             commentID: ID,
-            targetAccountID: accountID ?? this.client.account.accountID,
-            accountID: this.client.account.accountID,
-            gjp2: gjp2(this.client.account.password),
+            targetAccountID: accountID ?? auth.accountID,
+            ...auth,
         });
 
         if (data == '1') {
@@ -91,9 +86,9 @@ export class CommentClient extends RequestClient {
     }
 
     public async uploadComment(levelID: number, content: string, percent: number) {
-        if (!this.client.account) throw new Error('You must authenticate in order to do this');
+        const { auth, account } = this.requireAuth('upload a comment');
         const chkThing = chk(
-            [this.client.account.username, base64Encode(content), levelID, percent, 0],
+            [account.username, base64Encode(content), levelID, percent, 0],
             KEYS.COMMENT,
             SALTS.COMMENT,
         );
@@ -102,20 +97,19 @@ export class CommentClient extends RequestClient {
             levelID,
             comment: base64Encode(content),
             percent,
-            gjp2: gjp2(this.client.account.password),
-            accountID: this.client.account.accountID,
+            ...auth,
             chk: chkThing,
-            userName: this.client.account.username,
+            userName: account.username,
         });
     }
 
     public async deleteComment(levelID: number, commentID: number) {
-        if (!this.client.auth) throw new Error('You must authenticate in order to do this');
+        const { auth } = this.requireAuth('delete a comment');
 
         const data = await this.baseRequest('deleteComment', {
             levelID,
             commentID,
-            ...this.client.auth,
+            ...auth,
         });
 
         if (data == '1') {

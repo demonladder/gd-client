@@ -2,7 +2,7 @@ import { Client } from '../Client';
 import { LeaderboardRecord, User } from '../structures';
 import { RequestClient } from './RequestClient';
 import { LeaderboardType, LevelLeaderboardType } from '../enums';
-import { base64Encode, chk, generatePlatformerLeaderboardSeed, generateRandomString, gjp2, xor } from '../util';
+import { base64Encode, chk, generatePlatformerLeaderboardSeed, generateRandomString, xor } from '../util';
 import { parseLeaderboardRecords, parseUser } from '../util/parsers';
 import { KEYS, SALTS } from '../constants';
 
@@ -24,13 +24,13 @@ export class LeaderboardClient extends RequestClient {
     }
 
     public async getClassicLeaderboard(levelID: number, type: LevelLeaderboardType): Promise<LeaderboardRecord[]> {
-        if (type === LevelLeaderboardType.FRIENDS && !this.client.auth)
-            throw new Error('Cannot get friends scores without being authenticated');
+        const auth =
+            type === LevelLeaderboardType.FRIENDS ? this.requireAuth('get friends scores').auth : this.client.auth;
 
         const data = await this.baseRequest('getLevelLeaderboards', {
             type,
             levelID,
-            ...this.client.auth,
+            ...auth,
         });
         if (!data) throw new Error('No data returned');
 
@@ -63,6 +63,9 @@ export class LeaderboardClient extends RequestClient {
         mode = 1,
         opts: GetPlatformerLevelScoresOptions = {},
     ) {
+        // Scores can be read without logging in, in which case the credentials are left off.
+        const { auth, account } = this.client;
+
         let bestAttemptTime = opts.bestAttemptTime;
         if (!bestAttemptTime) {
             if (opts.time) bestAttemptTime = Math.floor(opts.time / 1000);
@@ -87,7 +90,7 @@ export class LeaderboardClient extends RequestClient {
 
         // accountID,levelID,percentage,bestAttemptTime,bestAttemptClicks,attempts,levelSeed,pbDiffs,1,coins,timelyID
         const values = [
-            this.client.account?.accountID ?? 0,
+            auth?.accountID ?? 0,
             levelID,
             opts.percentage ?? 0,
             bestAttemptTime,
@@ -121,10 +124,10 @@ export class LeaderboardClient extends RequestClient {
             s10: opts.timelyID ?? 0,
             levelID,
             chk: _chk,
-            accountID: this.client.account?.accountID,
-            gjp2: gjp2(this.client.account?.password ?? ''),
-            uuid: this.client.account?.playerID,
-            udid: this.client.account?.udid,
+            accountID: auth?.accountID,
+            gjp2: auth?.gjp2,
+            uuid: account?.playerID,
+            udid: account?.udid,
             percent: percentage ? percentage : undefined,
         };
 

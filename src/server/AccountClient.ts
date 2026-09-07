@@ -3,7 +3,7 @@ import { RequestClient } from './RequestClient';
 import { GdApiError } from '../types/gdApiError';
 import { DEFAULT_ACCOUNT_URL, SECRETS } from '../constants';
 import type { MapPack } from '../types/MapPack';
-import { base64DecodeBuffer, gjp2, robTopSplitDict, tryUnzip } from '../util';
+import { base64DecodeBuffer, robTopSplitDict, tryUnzip } from '../util';
 import { parseMapPack } from '../util/parsers';
 
 export interface LoginAccountResult {
@@ -71,7 +71,7 @@ export class AccountClient extends RequestClient {
     }
 
     /**
-     * @throws {Error} Throws if the client has not logged in.
+     * @throws {AuthenticationError} Throws if the client has not logged in.
      * @throws {GdApiError} Throws if the login was rejected, with the code the API returned — for
      * example -11 when the credentials are incorrect.
      * @param username
@@ -79,8 +79,7 @@ export class AccountClient extends RequestClient {
      * @returns
      */
     public async loginAccount(username: string, password: string): Promise<LoginAccountResult> {
-        const account = this.client.account;
-        if (!account) throw new Error('You must authenticate in order to do this');
+        const { account } = this.requireAuth('log in');
 
         const data = await this.baseRequest<number | string>(
             'loginAccount',
@@ -100,22 +99,14 @@ export class AccountClient extends RequestClient {
     }
 
     /**
-     * @throws {Error} Throws if the client has not logged in.
+     * @throws {AuthenticationError} Throws if the client has not logged in.
      * @returns The moderator access level, or `false` if the account has none.
      */
     public async requestModAccess(): Promise<string | false> {
-        const account = this.client.account;
-        if (!account) throw new Error('You must authenticate in order to do this');
+        const { auth } = this.requireAuth('request mod access');
 
         try {
-            return await this.baseRequest(
-                'requestModAccess',
-                {
-                    accountID: account.accountID,
-                    gjp2: gjp2(account.password),
-                },
-                { secret: SECRETS.ACCOUNT },
-            );
+            return await this.baseRequest('requestModAccess', { ...auth }, { secret: SECRETS.ACCOUNT });
         } catch (err) {
             if (err instanceof GdApiError && err.code === -1) return false;
 
@@ -124,7 +115,6 @@ export class AccountClient extends RequestClient {
     }
 
     /**
-     * @throws {Error} Throws if the client has not logged in.
      * @param type
      * @returns The URL to use for the given account action, or `false` if the API returned none.
      */
@@ -146,18 +136,16 @@ export class AccountClient extends RequestClient {
     }
 
     /**
-     * @throws {Error} Throws if the client has not logged in.
+     * @throws {AuthenticationError} Throws if the client has not logged in.
      * @returns
      */
     public async loadSaveData(): Promise<SaveData> {
-        const account = this.client.account;
-        if (!account) throw new Error('You must authenticate in order to load your save data');
+        const { auth, account } = this.requireAuth('load your save data');
 
         const data = await this.baseRequest(
             'loadSaveData',
             {
-                accountID: account.accountID,
-                gjp2: gjp2(account.password),
+                ...auth,
                 uuid: account.playerID,
                 udid: account.udid,
             },
@@ -184,21 +172,19 @@ export class AccountClient extends RequestClient {
     }
 
     /**
-     * @throws {Error} Throws if the client has not logged in.
+     * @throws {AuthenticationError} Throws if the client has not logged in.
      * @throws {GdApiError} Throws if the backup was rejected, with the code the API returned.
      * @param gameManager
      * @param localLevels
      * @returns
      */
     public async backupSaveData(gameManager: string, localLevels: string): Promise<string> {
-        const account = this.client.account;
-        if (!account) throw new Error('You must authenticate in order to backup save data');
+        const { auth, account } = this.requireAuth('backup your save data');
 
         const data = await this.baseRequest(
             'backupSaveData',
             {
-                accountID: account.accountID,
-                gjp2: gjp2(account.password),
+                ...auth,
                 uuid: account.playerID,
                 udid: account.udid,
                 saveData: `${gameManager};${localLevels}`,

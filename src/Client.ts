@@ -7,6 +7,7 @@ import { GetPlatformerLevelScoresOptions, LeaderboardClient } from './server/Lea
 import { Account } from './Account';
 import { LevelManager } from './managers/LevelManager';
 import { Version } from './interfaces/Version';
+import { AuthCredentials } from './interfaces/AuthCredentials';
 import { LikeClient } from './server/LikeClient';
 import { ListManager } from './managers/ListManager';
 import { RewardClient } from './server/RewardClient';
@@ -30,7 +31,7 @@ export class Client {
     public readonly socialsClient = new SocialsClient(this);
     public readonly songs = new SongClient(this);
     public readonly users = new UserClient(this);
-    public auth?: { accountID: number; gjp2: string };
+    public auth?: AuthCredentials;
 
     public constructor(
         public endpoints: Record<string, string> = DefaultEndpoints,
@@ -210,6 +211,7 @@ export class Client {
             account: this.account?.toJSON(),
             accountClient: this.accountClient.toJSON(),
             comments: this.comments.toJSON(),
+            leaderboardClient: this.leaderboardClient.toJSON(),
             levels: this.levels.toJSON(),
             likeClient: this.likeClient.toJSON(),
             lists: this.lists.toJSON(),

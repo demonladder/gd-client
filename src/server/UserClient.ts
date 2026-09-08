@@ -1,6 +1,6 @@
 import { Client } from '../Client';
 import { RequestClient } from './RequestClient';
-import { parseUser } from '../util/parsers';
+import { parsePageInfo, parseUser } from '../util/parsers';
 import { chk, generateRandomString } from '../util';
 import { KEYS, SALTS } from '../constants';
 
@@ -103,13 +103,10 @@ export class UserClient extends RequestClient {
         const data = await this.baseRequest('getUsers', { str: username });
         const segments = data.split('#');
         const users = segments[0].split('|').map((u) => parseUser(u, this.client));
-        const pages = segments[1].split(':');
 
         return {
             users,
-            total: Number(pages[0]),
-            offset: Number(pages[1]),
-            pageSize: Number(pages[2]),
+            ...parsePageInfo(segments[1]),
         };
     }
 

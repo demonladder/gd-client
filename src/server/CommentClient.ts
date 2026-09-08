@@ -1,15 +1,14 @@
 import { base64Encode, chk } from '../util';
 import { Client } from '../Client';
+import { PageInfo } from '../interfaces/PageInfo';
 import { PaginationOptions } from '../interfaces/PaginationOptions';
 import { RequestClient } from './RequestClient';
 import { Comment, Post } from '../structures';
+import { parsePageInfo } from '../util/parsers';
 import { KEYS, SALTS } from '../constants';
 
-export interface CommentResult {
+export interface CommentResult extends PageInfo {
     comments: Comment[];
-    total: number;
-    offset: number;
-    pageSize: number;
 }
 
 export enum CommentMode {
@@ -36,13 +35,10 @@ export class CommentClient extends RequestClient {
         });
         const segments = data.split('#');
         const comments = segments[0].split('|').map((u) => new Comment(this.client, u.split(':')[0]));
-        const pages = segments[1].split(':');
 
         return {
             comments,
-            total: Number(pages[0]),
-            offset: Number(pages[1]),
-            pageSize: Number(pages[2]),
+            ...parsePageInfo(segments[1]),
         };
     }
 

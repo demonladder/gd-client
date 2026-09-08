@@ -1,22 +1,17 @@
 import { Client } from '../Client';
 import { User } from '../structures';
 import { RequestClient } from './RequestClient';
-import { parseMessage, parseUser, type Message } from '../util/parsers';
+import { parseMessage, parsePageInfo, parseUser, type Message } from '../util/parsers';
+import { PageInfo } from '../interfaces/PageInfo';
 import { base64Encode, xor } from '../util';
 import { KEYS } from '../constants';
 
-export interface GetMessagesResult {
+export interface GetMessagesResult extends PageInfo {
     messages: Message[];
-    total: number;
-    offset: number;
-    pageSize: number;
 }
 
-export interface GetFriendRequestsResponse {
+export interface GetFriendRequestsResponse extends PageInfo {
     friendRequests: User[];
-    total: number;
-    offset: number;
-    pageSize: number;
 }
 
 export class SocialsClient extends RequestClient {
@@ -47,13 +42,10 @@ export class SocialsClient extends RequestClient {
 
         const segments = data.split('#');
         const messages = segments[0].split('|').map((m) => parseMessage(m));
-        const pages = segments[1].split(':');
 
         return {
             messages,
-            total: Number(pages[0]),
-            offset: Number(pages[1]),
-            pageSize: Number(pages[2]),
+            ...parsePageInfo(segments[1]),
         };
     }
 
@@ -153,13 +145,10 @@ export class SocialsClient extends RequestClient {
 
         const segments = data.split('#');
         const friendRequests = segments[0].split('|').map((m) => parseUser(m, this.client));
-        const pages = segments[1].split(':');
 
         return {
             friendRequests,
-            total: Number(pages[0]),
-            offset: Number(pages[1]),
-            pageSize: Number(pages[2]),
+            ...parsePageInfo(segments[1]),
         };
     }
 

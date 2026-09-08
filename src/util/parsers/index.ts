@@ -8,5 +8,6 @@ export * from './parseLeaderboardRecords';
 export * from './parseLevel';
 export * from './parseMapPack';
 export * from './parseMessage';
+export * from './parsePageInfo';
 export * from './parseSongs';
 export * from './parseUser';

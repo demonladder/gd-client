@@ -3,13 +3,11 @@ import { RequestClient } from './RequestClient';
 import { GdApiError } from '../types/gdApiError';
 import { type Artist } from '../types/Artist';
 import { type Song } from '../types/Song';
-import { parseArtists, parseSongs } from '../util/parsers';
+import { parseArtists, parsePageInfo, parseSongs } from '../util/parsers';
+import { PageInfo } from '../interfaces/PageInfo';
 
-export interface ArtistResult {
+export interface ArtistResult extends PageInfo {
     artists: Artist[];
-    total: number;
-    offset: number;
-    pageSize: number;
 }
 
 export class SongClient extends RequestClient {
@@ -43,13 +41,10 @@ export class SongClient extends RequestClient {
         const segments = (await this.baseRequest('getTopArtists', { page })).split('#');
 
         const artists = parseArtists(segments[0]);
-        const pageInfo = segments[1].split(':');
 
         return {
             artists,
-            total: Number(pageInfo[0]),
-            offset: Number(pageInfo[1]),
-            pageSize: Number(pageInfo[2]),
+            ...parsePageInfo(segments[1]),
         };
     }
 }

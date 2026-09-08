@@ -17,7 +17,8 @@ import { RequestClient, type RequestOptions } from './RequestClient';
 import { LevelSearchType } from '../enums';
 import { AuthenticationError } from '../types/AuthenticationError';
 import { type TinyUser } from '../types/TinyUser';
-import { parseLevel, parseMapPack, parseSongs, parseUsers } from '../util/parsers';
+import { parseLevel, parseMapPack, parsePageInfo, parseSongs, parseUsers } from '../util/parsers';
+import { PageInfo } from '../interfaces/PageInfo';
 import type { Song } from '../types/Song';
 import { KEYS, SALTS, SECRETS } from '../constants';
 
@@ -45,13 +46,10 @@ export interface UploadLevelOptions {
     sfxIDs?: number[];
 }
 
-export interface GetLevelsResponse {
+export interface GetLevelsResponse extends PageInfo {
     levels: Level[];
     songs: Record<string, Song>;
     users: TinyUser[];
-    total: number;
-    offset: number;
-    pageSize: number;
 }
 
 export class LevelClient extends RequestClient {
@@ -257,15 +255,12 @@ export class LevelClient extends RequestClient {
         const levels = segments[0]?.split('|').map((l) => parseLevel(this.client, l));
         const users = segments[1];
         const songs = parseSongs(segments[2]);
-        const pages = segments[3].split(':').map(Number);
 
         return {
             levels,
             songs,
             users: parseUsers(users),
-            total: pages[0],
-            offset: pages[1],
-            pageSize: pages[2],
+            ...parsePageInfo(segments[3]),
         };
     }
 
@@ -337,7 +332,6 @@ export class LevelClient extends RequestClient {
         const data = await this.baseRequest('getMapPacks', {}, params);
         const segments = data.split('#');
         const packsRaw = segments[0].split('|');
-        const pages = segments[1].split(':');
         const hash = segments[2];
         const packs = [];
         for (const pack of packsRaw) {
@@ -346,9 +340,7 @@ export class LevelClient extends RequestClient {
 
         return {
             packs,
-            total: Number(pages[0]),
-            offset: Number(pages[1]),
-            pageSize: Number(pages[2]),
+            ...parsePageInfo(segments[1]),
             hash,
             isHashValid: generateMapPacksHash(packs) == hash,
         };
@@ -409,12 +401,10 @@ export class LevelClient extends RequestClient {
 
         const segments = data.split('#');
         const comments = segments[0].split('|').map((c) => new Comment(this.client, c + `~1~${levelID}`));
-        const pages = segments[1].split(':');
+
         return {
             comments,
-            total: Number(pages[0]),
-            offset: Number(pages[1]),
-            pageSize: Number(pages[2]),
+            ...parsePageInfo(segments[1]),
         };
     }
 

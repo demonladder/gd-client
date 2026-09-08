@@ -5,6 +5,7 @@ src/
 .npmrc
 .prettierrc
 bun.lock
+CLAUDE.md
 eslint.config.mjs
 knip.json
 tsconfig.json

@@ -7,20 +7,50 @@ import { LevelCommentManager } from '../managers/LevelCommentManager';
 export class Level extends Base {
     public readonly ID: number;
     public readonly description?: string;
+
+    /**
+     * The raw level data.
+     */
     public readonly levelString?: string;
     public readonly version?: number;
+
+    /**
+     * ID of the player that uploaded this level.
+     */
     public readonly playerID?: number;
     public readonly difficulty?: number;
     public readonly completions?: number;
+
+    /**
+     * The official song ID this level uses. Undefined if using a custom song.
+     */
     public readonly officialSong?: number;
+
+    /**
+     * The game version when this level was uploaded.
+     * `X` versions translate to `1.X` and `XX` translates to `X.X`.
+     * `7` would be `v1.7` and `22` would be `v2.2`.
+     */
     public readonly gameVersion: number;
     public readonly likes: number;
     public readonly downloads: number;
     public readonly length: LevelLength;
+
+    /**
+     * How many stars this level grants on completion.
+     */
     public readonly stars?: number;
     public readonly featureScore: number;
     public readonly copiedFromID?: number;
+
+    /**
+     * The Newgrounds audio ID this level uses. Undefined if using an official song.
+     */
     public readonly customSongID?: number;
+
+    /**
+     * How many coins this level has.
+     */
     public readonly coins: number;
     public readonly starsRequested: number;
     public readonly dailyNumber?: number;
@@ -33,12 +63,24 @@ export class Level extends Base {
     public readonly isDemon: boolean;
     public readonly isAuto: boolean;
     public readonly isTwoPlayer: boolean;
+
+    /**
+     * True if the coins were collected during verification.
+     */
     public readonly areCoinsVerified: boolean;
     public readonly isLowDetailMode: boolean;
     public readonly isGauntlet: boolean;
     public readonly name: string;
     public readonly recordString?: string;
+
+    /**
+     * When the level was uploaded as an ISO 8601 string with the format `YYYY-MM-DDTHH:mm:ss.SSSZ`.
+     */
     public readonly uploadDate?: string;
+
+    /**
+     * When the level was last updated as an ISO 8601 string with the format `YYYY-MM-DDTHH:mm:ss.SSSZ`.
+     */
     public readonly updateDate?: string;
     public readonly extraString?: string;
     public readonly settingsString?: string;

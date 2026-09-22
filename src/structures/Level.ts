@@ -6,27 +6,29 @@ import { LevelCommentManager } from '../managers/LevelCommentManager';
 
 export class Level extends Base {
     public readonly ID: number;
+    public readonly description?: string;
     public readonly levelString?: string;
-    public readonly version: number;
-    public readonly playerID: number;
-    public readonly difficulty: number;
+    public readonly version?: number;
+    public readonly playerID?: number;
+    public readonly difficulty?: number;
     public readonly completions?: number;
-    public readonly officialSong: number;
+    public readonly officialSong?: number;
     public readonly gameVersion: number;
     public readonly likes: number;
+    public readonly downloads: number;
     public readonly length: LevelLength;
-    public readonly stars: number;
+    public readonly stars?: number;
     public readonly featureScore: number;
-    public readonly copiedFromID: number;
-    public readonly customSongID: number;
+    public readonly copiedFromID?: number;
+    public readonly customSongID?: number;
     public readonly coins: number;
     public readonly starsRequested: number;
     public readonly dailyNumber?: number;
     public readonly epicRating: number;
     public readonly demonDifficulty: number;
-    public readonly objects: number;
-    public readonly editorTimeSeconds: number;
-    public readonly editorTimeCopiesSeconds: number;
+    public readonly objects?: number;
+    public readonly editorTimeSeconds?: number;
+    public readonly editorTimeCopiesSeconds?: number;
     public readonly verificationTimeFrames?: number;
     public readonly isDemon: boolean;
     public readonly isAuto: boolean;
@@ -41,6 +43,8 @@ export class Level extends Base {
     public readonly extraString?: string;
     public readonly settingsString?: string;
     public readonly password?: string;
+    public readonly songIds: number[];
+    public readonly sfxIds: number[];
 
     public readonly comments: LevelCommentManager;
 
@@ -48,6 +52,7 @@ export class Level extends Base {
         super(client);
 
         this.ID = data.ID;
+        this.description = data.description;
         this.levelString = data.levelString;
         this.version = data.version;
         this.playerID = data.playerID;
@@ -56,6 +61,7 @@ export class Level extends Base {
         this.officialSong = data.officialSong;
         this.gameVersion = data.gameVersion;
         this.likes = data.likes;
+        this.downloads = data.downloads;
         this.length = data.length;
         this.stars = data.stars;
         this.featureScore = data.featureScore;
@@ -82,6 +88,8 @@ export class Level extends Base {
         this.updateDate = data.updateDate;
         this.extraString = data.extraString;
         this.settingsString = data.settingsString;
+        this.songIds = data.songIds;
+        this.sfxIds = data.sfxIds;
 
         this.comments = new LevelCommentManager(client, this);
     }
@@ -103,6 +111,9 @@ export class Level extends Base {
     public toJSON() {
         return {
             ID: this.ID,
+            name: this.name,
+            description: this.description,
+            password: this.password,
             levelString: this.levelString,
             version: this.version,
             playerID: this.playerID,
@@ -111,6 +122,7 @@ export class Level extends Base {
             officialSong: this.officialSong,
             gameVersion: this.gameVersion,
             likes: this.likes,
+            downloads: this.downloads,
             length: this.length,
             stars: this.stars,
             featureScore: this.featureScore,
@@ -131,7 +143,6 @@ export class Level extends Base {
             areCoinsVerified: this.areCoinsVerified,
             isLowDetailMode: this.isLowDetailMode,
             isGauntlet: this.isGauntlet,
-            name: this.name,
             recordString: this.recordString,
             uploadDate: this.uploadDate,
             updateDate: this.updateDate,
@@ -139,5 +150,10 @@ export class Level extends Base {
             settingsString: this.settingsString,
             comments: this.comments.toJSON(),
         };
+    }
+
+    public toString(pretty = false): string {
+        if (pretty) return JSON.stringify(this.toJSON(), null, 4);
+        return JSON.stringify(this.toJSON());
     }
 }

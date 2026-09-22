@@ -14,4 +14,5 @@ export * from './remapKeys';
 export * from './robTopSplit';
 export * from './sha1';
 export * from './tryUnzip';
+export * from './TypedMap';
 export * from './xor';

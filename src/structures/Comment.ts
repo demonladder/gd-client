@@ -2,7 +2,6 @@ import { Base } from '../Base';
 import { Client } from '../Client';
 import { ContentType } from '../enums';
 import { base64Decode, robTopSplit } from '../util';
-import { parseIntAssert, parseIntUndefined } from '../util/parsers';
 
 const userCommentKeyMap = {
     levelID: '1',
@@ -34,17 +33,17 @@ export class Comment extends Base {
 
         const data = robTopSplit(str, '~');
 
-        this.levelID = parseIntAssert(data.get(userCommentKeyMap.levelID));
+        this.levelID = data.getIntOrThrow(userCommentKeyMap.levelID);
         if (!data.has(userCommentKeyMap.content)) throw new Error('Parsing error: Comment content is missing.');
         this.content = base64Decode(data.get(userCommentKeyMap.content)!);
-        this.playerID = parseIntAssert(data.get(userCommentKeyMap.playerID));
-        this.likes = parseIntAssert(data.get(userCommentKeyMap.likes));
-        this.ID = parseIntAssert(data.get(userCommentKeyMap.ID));
-        this.percent = parseIntAssert(data.get(userCommentKeyMap.percent));
+        this.playerID = data.getIntOrThrow(userCommentKeyMap.playerID);
+        this.likes = data.getIntOrThrow(userCommentKeyMap.likes);
+        this.ID = data.getIntOrThrow(userCommentKeyMap.ID);
+        this.percent = data.getIntOrThrow(userCommentKeyMap.percent);
 
         this.age = data.get(userCommentKeyMap.age);
         this.isSpam = data.get(userCommentKeyMap.spam) === '1';
-        this.modBadge = parseIntUndefined(data.get(userCommentKeyMap.modBadge));
+        this.modBadge = data.getInt(userCommentKeyMap.modBadge);
         if (data.has(userCommentKeyMap.textColor)) {
             const [r, g, b] = data.get(userCommentKeyMap.textColor)!.split(',').map(Number);
             this.textColor = { r, g, b };

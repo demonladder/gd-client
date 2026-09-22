@@ -2,118 +2,118 @@ import type { Client } from '../../Client';
 import { KEYS } from '../../constants';
 import { Level } from '../../structures';
 import { base64Decode, robTopSplit, xor } from '..';
-import { parseIntUndefined } from '.';
+import { LevelLength } from '../../enums';
 
-interface LevelMetaData {
-    description?: string;
-    password?: string;
-    songIDs?: string[];
-    sfxIDs?: string[];
+function parseLevelLength(length: number) {
+    // prettier-ignore
+    switch (length) {
+        default:
+        case 0: return LevelLength.TINY;
+        case 1: return LevelLength.SHORT;
+        case 2: return LevelLength.MEDIUM;
+        case 3: return LevelLength.LONG;
+        case 4: return LevelLength.XL;
+        case 5: return LevelLength.PLATFORMER;
+    }
 }
 
 export function parseLevel(client: Client, str: string): Level {
-    const json: Partial<LevelMetaData> = {};
-    const raw = robTopSplit(str, ':'); // "1:22:5:1:10:1000" -> { 1: "22", 5: "1", 10: "1000" } -> { id: 22, version: 1, downloads: 1000 }
+    const raw = robTopSplit(str, ':');
     const levelString = raw.get('4');
 
-    if (!raw.get('1')) throw new Error('Parsing error: Level ID is missing.');
-
-    const ID = parseInt(raw.get('1') ?? '');
-    const version = parseInt(raw.get('5') ?? '');
-    const playerID = parseInt(raw.get('6') ?? '');
-    let difficulty = parseInt(raw.get('9') ?? '');
-    const completions = parseIntUndefined(raw.get('11') ?? '');
-    const officialSong = parseInt(raw.get('12') ?? '');
-    const gameVersion = parseInt(raw.get('13') ?? '');
-    const likes = parseInt(raw.get('14') ?? '');
-    const length = parseInt(raw.get('15') ?? '');
-    const stars = parseInt(raw.get('18') ?? '');
-    const featureScore = parseInt(raw.get('19') ?? '');
-    const copiedFromID = parseInt(raw.get('30') ?? '');
-    const customSongID = parseInt(raw.get('35') ?? '');
-    const coins = parseInt(raw.get('37') ?? '');
-    const starsRequested = parseInt(raw.get('39') ?? '');
-    const dailyNumber = parseIntUndefined(raw.get('41') ?? '');
-    const epicRating = parseInt(raw.get('42') ?? '');
-    const demonDifficulty = parseInt(raw.get('43') ?? '');
-    const objects = parseInt(raw.get('45') ?? '');
-    const editorTimeSeconds = parseInt(raw.get('46') ?? '');
-    const editorTimeCopiesSeconds = parseInt(raw.get('47') ?? '');
-    const verificationTimeFrames = parseIntUndefined(raw.get('57'));
-
-    const isDemon = raw.get('17') === '1';
-    const isAuto = raw.get('25') === '1';
-    const isTwoPlayer = raw.get('31') === '1';
-    const areCoinsVerified = raw.get('38') === '1';
-    const isLowDetailMode = raw.get('40') === '1';
-    const isGauntlet = raw.get('44') === '1';
-
-    //if (!raw.get("26")) throw new Error("Parsing error: Level record string is missing.");
-    //if (!raw.get("28")) throw new Error("Parsing error: Level upload date is missing.");
-    //if (!raw.get("29")) throw new Error("Parsing error: Level update date is missing.");
-    //if (!raw.get("36")) throw new Error("Parsing error: Level extra string is missing.");
-    //if (!raw.get("48")) throw new Error("Parsing error: Level settings string is missing");
-    const name = raw.get('2');
-    if (!name) throw new Error('Parsing error: Level name is missing.');
+    const ID = raw.getIntOrThrow('1', 'Parsing error: Level ID is missing');
+    const name = raw.getOrThrow('2', 'Parsing error: Level name is missing.');
+    const version = raw.getInt('5');
+    const playerID = raw.getInt('6');
+    let difficulty = raw.getInt('9');
+    const downloads = raw.getIntOrThrow('10');
+    const completions = raw.getInt('11');
+    const officialSong = raw.getIntOrThrow('12');
+    const likes = raw.getIntOrThrow('14');
+    const length = parseLevelLength(raw.getIntOrThrow('15'));
+    const isDemon = raw.getBool('17');
+    const stars = raw.getInt('18');
+    const featureScore = raw.getIntOrThrow('19');
+    const isAuto = raw.getBool('25');
     const recordString = raw.get('26');
-    const uploadDate = raw.get('28');
-    const updateDate = raw.get('29');
+    const copiedFromID = raw.getInt('30');
+    const isTwoPlayer = raw.getBool('31');
+    const customSongID = raw.getInt('35');
     const extraString = raw.get('36');
-    const settingsString = raw.get('48');
+    const coins = raw.getIntOrThrow('37');
+    const areCoinsVerified = raw.getBool('38');
+    const starsRequested = raw.getIntOrThrow('39');
+    const isLowDetailMode = raw.getBool('40');
+    const dailyNumber = raw.getInt('41');
+    const epicRating = raw.getIntOrThrow('42');
+    const demonDifficulty = raw.getIntOrThrow('43');
+    const isGauntlet = raw.getBool('44');
+    const objects = raw.getInt('45');
 
-    if (raw.get('3')) {
-        json.description = base64Decode(raw.get('3')!).toString();
+    const editorTimeSeconds = raw.getInt('46');
+    const editorTimeCopiesSeconds = raw.getInt('47');
+    const settingsString = raw.get('48');
+    const verificationTimeFrames = raw.getInt('57');
+
+    const uploadedAt = new Date(raw.getIntOrThrow('62') * 1000).toISOString();
+    const updatedAt = new Date(raw.getIntOrThrow('63') * 1000).toISOString();
+
+    let description: string | undefined;
+    if (raw.has('3')) {
+        description = base64Decode(raw.get('3')!).toString();
         // eslint-disable-next-line no-control-regex
-        if (/[\x00-\x1f]/.exec(json.description)) {
-            json.description = raw.get('3');
+        if (/[\x00-\x1f]/.test(description)) {
+            description = raw.get('3')!;
         }
     }
 
-    if (Number(raw.get('8')) && difficulty) {
-        difficulty /= Number(raw.get('8'));
+    if (raw.getInt('8') !== undefined && difficulty) {
+        difficulty /= raw.getIntOrThrow('8');
     }
 
-    if (raw.get('27')) {
-        const password = xor(base64Decode(raw.get('27')!).toString(), KEYS.LEVEL_PASSWORD);
-        if (password.toString().length != 1) json.password = password.slice(1);
-        else json.password = password;
+    let password: string | undefined = undefined;
+    if (raw.has('27')) {
+        const p = xor(base64Decode(raw.get('27')!).toString(), KEYS.LEVEL_PASSWORD);
+        if (p.toString().length != 1) password = p.slice(1);
+        else password = p;
     }
 
-    if (raw.get('52')) {
-        json.songIDs = raw.get('52')!.split(',');
-    }
+    const songIds: number[] =
+        raw
+            .get('52')
+            ?.split(',')
+            .map((id) => parseInt(id)) ?? [];
 
-    if (raw.get('53')) {
-        json.sfxIDs = raw.get('53')!.split(',');
-    }
+    const sfxIds: number[] =
+        raw
+            .get('53')
+            ?.split(',')
+            .map((id) => parseInt(id)) ?? [];
 
-    // Add unknown keys to the metadata
-    // for (const i of raw.keys()) {
-    //     if (!levelBoolKeys[i] && !levelStringKeys[i] && !levelNumberKeys[i] && !(["3", "4", "8", "27", "52", "53"].includes(i))) {
-    //         json[`unk_${i}`] = raw.get(i);
-    //     }
-    // }
     const level = new Level(client, {
         ID,
+        description,
+        password,
         levelString,
         version,
         playerID,
         difficulty,
         completions,
-        officialSong,
-        gameVersion,
+        officialSong: officialSong !== 0 ? officialSong : undefined,
+        gameVersion: raw.getIntOrThrow('13'),
         likes,
         length,
-        stars,
+        downloads,
+        stars: stars !== 0 ? stars : undefined,
         featureScore,
-        copiedFromID,
-        customSongID,
+        copiedFromID: copiedFromID !== 0 ? copiedFromID : undefined,
+        customSongID: customSongID !== 0 ? customSongID : undefined,
         coins,
         starsRequested,
         dailyNumber,
         epicRating,
         demonDifficulty,
-        objects,
+        objects: objects !== 0 ? objects : undefined,
         editorTimeSeconds,
         editorTimeCopiesSeconds,
         verificationTimeFrames,
@@ -125,10 +125,12 @@ export function parseLevel(client: Client, str: string): Level {
         isGauntlet,
         name,
         recordString,
-        uploadDate,
-        updateDate,
+        uploadDate: uploadedAt,
+        updateDate: updatedAt,
         extraString,
         settingsString,
+        songIds,
+        sfxIds,
     });
 
     return level;

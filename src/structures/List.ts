@@ -1,7 +1,6 @@
 import { Base } from '../Base';
 import { Client } from '../Client';
 import { ContentType } from '../enums';
-import { parseIntAssert, parseIntUndefined } from '../util/parsers';
 import { robTopSplit } from '../util';
 
 const listKeyMap = {
@@ -47,20 +46,20 @@ export class List extends Base {
         super(client);
 
         const data = robTopSplit(str, ':');
-        this.ID = parseIntAssert(data.get(listKeyMap.ID));
-        this.version = parseIntAssert(data.get(listKeyMap.version));
-        this.playerID = parseIntUndefined(data.get(listKeyMap.playerID));
-        this.difficulty = parseIntAssert(data.get(listKeyMap.difficulty));
-        this.downloads = parseIntAssert(data.get(listKeyMap.downloads));
-        this.likes = parseIntAssert(data.get(listKeyMap.likes));
-        this.length = parseIntUndefined(data.get(listKeyMap.length));
-        this.stars = parseIntUndefined(data.get(listKeyMap.stars));
-        this.uploadDate = new Date(parseIntAssert(data.get(listKeyMap.uploadDate)) * 1000);
+        this.ID = data.getIntOrThrow(listKeyMap.ID);
+        this.version = data.getIntOrThrow(listKeyMap.version);
+        this.playerID = data.getInt(listKeyMap.playerID);
+        this.difficulty = data.getIntOrThrow(listKeyMap.difficulty);
+        this.downloads = data.getIntOrThrow(listKeyMap.downloads);
+        this.likes = data.getIntOrThrow(listKeyMap.likes);
+        this.length = data.getInt(listKeyMap.length);
+        this.stars = data.getInt(listKeyMap.stars);
+        this.uploadDate = new Date(data.getIntOrThrow(listKeyMap.uploadDate) * 1000);
         this.updateDate = data.has(listKeyMap.updateDate)
-            ? new Date(parseIntAssert(data.get(listKeyMap.updateDate)) * 1000)
+            ? new Date(data.getIntOrThrow(listKeyMap.updateDate) * 1000)
             : undefined;
-        this.listReward = parseIntAssert(data.get(listKeyMap.listReward));
-        this.listRewardRequirement = parseIntAssert(data.get(listKeyMap.listRewardRequirement));
+        this.listReward = data.getIntOrThrow(listKeyMap.listReward);
+        this.listRewardRequirement = data.getIntOrThrow(listKeyMap.listRewardRequirement);
 
         if (!data.has(listKeyMap.name)) throw new Error('Parsing error: List name is missing.');
         if (!data.has(listKeyMap.username)) throw new Error('Parsing error: List username is missing.');

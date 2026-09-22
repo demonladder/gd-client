@@ -1,7 +1,6 @@
 import { Base } from '../Base';
 import { Client } from '../Client';
 import { base64Decode, robTopSplit } from '../util';
-import { parseIntAssert } from '../util/parsers';
 
 const postKeyMap = {
     content: '2',
@@ -20,10 +19,10 @@ export class Post extends Base {
         super(client);
 
         const data = robTopSplit(str, '~');
-        this.ID = parseIntAssert(data.get(postKeyMap.ID));
+        this.ID = data.getIntOrThrow(postKeyMap.ID);
         if (!data.has(postKeyMap.content)) throw new Error('Parsing error: Post content is missing.');
         this.content = base64Decode(data.get(postKeyMap.content)!);
-        this.likes = parseIntAssert(data.get(postKeyMap.likes));
+        this.likes = data.getIntOrThrow(postKeyMap.likes);
         if (!data.has(postKeyMap.age)) throw new Error('Parsing error: Post age is missing.');
         this.age = data.get(postKeyMap.age)!;
     }

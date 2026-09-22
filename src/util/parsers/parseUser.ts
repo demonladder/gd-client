@@ -1,7 +1,7 @@
 import type { Client } from '../../Client';
 import { User } from '../../structures';
 import { robTopSplit, base64Decode } from '..';
-import { parseIntAssert, parseIntUndefined } from '.';
+import { parseIntUndefined } from './parseIntUndefined';
 import type { TinyUser } from '../../types/TinyUser';
 
 export function parseUser(str: string, client: Client, sep = ':'): User {
@@ -61,48 +61,48 @@ export function parseUser(str: string, client: Client, sep = ':'): User {
 
     return new User(
         client,
-        parseIntAssert(raw.get('16')), // accountID
-        parseIntAssert(raw.get('2')), // playerID
-        parseIntAssert(raw.get('9')), // iconID
-        parseIntAssert(raw.get('10')), // color1
-        parseIntAssert(raw.get('11')), // color2
-        parseIntAssert(raw.get('13')), // secretCoins
-        parseIntAssert(raw.get('17')), // userCoins
-        parseIntAssert(raw.get('3')), // stars
-        parseIntAssert(raw.get('52')), // moons
-        parseIntAssert(raw.get('46')), // diamonds
-        parseIntAssert(raw.get('4')), // demons
-        parseIntAssert(raw.get('14')), // iconType
-        parseIntAssert(raw.get('15')), // special
-        parseIntAssert(raw.get('18')), // messagePermissions
-        parseIntAssert(raw.get('19')), // friendPermissions
-        parseIntAssert(raw.get('21')), // cube
-        parseIntAssert(raw.get('22')), // ship
-        parseIntAssert(raw.get('23')), // ball
-        parseIntAssert(raw.get('24')), // ufo
-        parseIntAssert(raw.get('25')), // wave
-        parseIntAssert(raw.get('26')), // robot
-        parseIntAssert(raw.get('53')), // swing
-        parseIntAssert(raw.get('54')), // jetpack
-        parseIntAssert(raw.get('27')), // trail
-        parseIntAssert(raw.get('28')), // glow
-        parseIntAssert(raw.get('30')), // globalRank
-        parseIntAssert(raw.get('31')), // friendState
-        parseIntAssert(raw.get('32')), // friendRequestID
-        parseIntAssert(raw.get('38')), // messages
-        parseIntAssert(raw.get('39')), // friendRequests
-        parseIntAssert(raw.get('40')), // newFriends
-        parseIntAssert(raw.get('43')), // spider
-        parseIntAssert(raw.get('48')), // deathEffect
-        parseIntAssert(raw.get('49')), // modLevel
-        parseIntAssert(raw.get('50')), // commentHistoryPermissions
-        parseIntUndefined(raw.get('7')), // accountHighlight
-        parseIntUndefined(raw.get('51')), // color3
+        raw.getIntOrThrow('16'), // accountID
+        raw.getIntOrThrow('2'), // playerID
+        raw.getIntOrThrow('9'), // iconID
+        raw.getIntOrThrow('10'), // color1
+        raw.getIntOrThrow('11'), // color2
+        raw.getIntOrThrow('13'), // secretCoins
+        raw.getIntOrThrow('17'), // userCoins
+        raw.getIntOrThrow('3'), // stars
+        raw.getIntOrThrow('52'), // moons
+        raw.getIntOrThrow('46'), // diamonds
+        raw.getIntOrThrow('4'), // demons
+        raw.getIntOrThrow('14'), // iconType
+        raw.getIntOrThrow('15'), // special
+        raw.getIntOrThrow('18'), // messagePermissions
+        raw.getIntOrThrow('19'), // friendPermissions
+        raw.getIntOrThrow('21'), // cube
+        raw.getIntOrThrow('22'), // ship
+        raw.getIntOrThrow('23'), // ball
+        raw.getIntOrThrow('24'), // ufo
+        raw.getIntOrThrow('25'), // wave
+        raw.getIntOrThrow('26'), // robot
+        raw.getIntOrThrow('53'), // swing
+        raw.getIntOrThrow('54'), // jetpack
+        raw.getIntOrThrow('27'), // trail
+        raw.getIntOrThrow('28'), // glow
+        raw.getIntOrThrow('30'), // globalRank
+        raw.getIntOrThrow('31'), // friendState
+        raw.getIntOrThrow('32'), // friendRequestID
+        raw.getIntOrThrow('38'), // messages
+        raw.getIntOrThrow('39'), // friendRequests
+        raw.getIntOrThrow('40'), // newFriends
+        raw.getIntOrThrow('43'), // spider
+        raw.getIntOrThrow('48'), // deathEffect
+        raw.getIntOrThrow('49'), // modLevel
+        raw.getIntOrThrow('50'), // commentHistoryPermissions
+        raw.getInt('7'), // accountHighlight
+        raw.getInt('51'), // color3
         raw.has('35') ? base64Decode(raw.get('35')!) : undefined, // comment
-        parseIntUndefined(raw.get('8')), // creatorPoints
+        raw.getInt('8'), // creatorPoints
         demonCounts,
         levelCounts,
-        parseIntUndefined(raw.get('6')),
+        raw.getInt('6'),
     );
 }
 

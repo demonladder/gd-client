@@ -20,7 +20,7 @@ import { type TinyUser } from '../types/TinyUser';
 import { parseLevel, parseMapPack, parsePageInfo, parseSongs, parseUsers } from '../util/parsers';
 import { PageInfo } from '../interfaces/PageInfo';
 import type { Song } from '../types/Song';
-import { KEYS, SALTS, SECRETS } from '../constants';
+import { CryptKey, Salt, Secret } from '../constants';
 
 export interface UploadLevelOptions {
     id?: number;
@@ -125,8 +125,8 @@ export class LevelClient extends RequestClient {
             creds.inc = Number(!!increment);
             creds.chk = chk(
                 [levelID, creds.inc, creds.rs, auth.accountID, creds.udid, creds.uuid],
-                KEYS.LEVEL,
-                SALTS.LEVEL,
+                CryptKey.LEVEL,
+                Salt.LEVEL,
             );
             // delete params.udid
             // delete params.uuid
@@ -429,7 +429,7 @@ export class LevelClient extends RequestClient {
                 ...instance.auth,
             },
             {
-                secret: params.secret ?? SECRETS.MOD,
+                secret: params.secret ?? Secret.MOD,
                 ...params,
             },
         );
@@ -441,8 +441,8 @@ export class LevelClient extends RequestClient {
         const randomString = generateRandomString(10);
         const chkThing = chk(
             [levelID, stars, randomString, auth.accountID, account.udid, account.playerID],
-            KEYS.RATE,
-            SALTS.LIKE_OR_RATE,
+            CryptKey.RATE,
+            Salt.LIKE_OR_RATE,
         );
 
         return await this.baseRequest('rateLevel', {

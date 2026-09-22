@@ -1,7 +1,7 @@
 import { Client } from '../Client';
 import { RequestClient } from './RequestClient';
 import { GdApiError } from '../types/gdApiError';
-import { DEFAULT_ACCOUNT_URL, SECRETS } from '../constants';
+import { DEFAULT_ACCOUNT_URL, Secret } from '../constants';
 import type { MapPack } from '../types/MapPack';
 import { base64DecodeBuffer, robTopSplitDict, tryUnzip } from '../util';
 import { parseMapPack } from '../util/parsers';
@@ -63,7 +63,7 @@ export class AccountClient extends RequestClient {
         const data = await this.baseRequest<number | string>(
             'registerAccount',
             { userName: username, email, password },
-            { secret: secret ?? SECRETS.ACCOUNT },
+            { secret: secret ?? Secret.ACCOUNT },
         );
 
         const code = Number(data);
@@ -84,7 +84,7 @@ export class AccountClient extends RequestClient {
         const data = await this.baseRequest<number | string>(
             'loginAccount',
             { userName: username, password, udid: account.udid },
-            { secret: SECRETS.ACCOUNT, server: DEFAULT_ACCOUNT_URL },
+            { secret: Secret.ACCOUNT, server: DEFAULT_ACCOUNT_URL },
         );
 
         const code = Number(data);
@@ -106,7 +106,7 @@ export class AccountClient extends RequestClient {
         const { auth } = this.requireAuth('request mod access');
 
         try {
-            return await this.baseRequest('requestModAccess', { ...auth }, { secret: SECRETS.ACCOUNT });
+            return await this.baseRequest('requestModAccess', { ...auth }, { secret: Secret.ACCOUNT });
         } catch (err) {
             if (err instanceof GdApiError && err.code === -1) return false;
 
@@ -126,7 +126,7 @@ export class AccountClient extends RequestClient {
                     accountID: this.client.account?.accountID ?? 18120421,
                     type,
                 },
-                { secret: SECRETS.ACCOUNT },
+                { secret: Secret.ACCOUNT },
             );
         } catch (err) {
             if (err instanceof GdApiError && err.code === -1) return false;
@@ -149,7 +149,7 @@ export class AccountClient extends RequestClient {
                 uuid: account.playerID,
                 udid: account.udid,
             },
-            { secret: SECRETS.ACCOUNT, server: DEFAULT_ACCOUNT_URL },
+            { secret: Secret.ACCOUNT, server: DEFAULT_ACCOUNT_URL },
         );
 
         const elements = data.split(';');
@@ -189,7 +189,7 @@ export class AccountClient extends RequestClient {
                 udid: account.udid,
                 saveData: `${gameManager};${localLevels}`,
             },
-            { secret: SECRETS.ACCOUNT, server: DEFAULT_ACCOUNT_URL },
+            { secret: Secret.ACCOUNT, server: DEFAULT_ACCOUNT_URL },
         );
 
         const code = Number(data);

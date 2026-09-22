@@ -3,7 +3,7 @@ import { List } from '../structures';
 import { RequestClient } from './RequestClient';
 import { ListSearchType } from '../enums';
 import { base64Encode, generateRandomString, generateUploadListSeed } from '../util';
-import { SECRETS } from '../constants';
+import { Secret } from '../constants';
 
 export interface GetListsOptions {
     query?: string;
@@ -142,7 +142,7 @@ export class ListClient extends RequestClient {
                 ...auth,
             },
             {
-                secret: SECRETS.DELETE,
+                secret: Secret.DELETE,
             },
         );
     }

@@ -4,7 +4,7 @@ import { RequestClient } from './RequestClient';
 import { parseMessage, parsePageInfo, parseUser, type Message } from '../util/parsers';
 import { PageInfo } from '../interfaces/PageInfo';
 import { base64Encode, xor } from '../util';
-import { KEYS } from '../constants';
+import { CryptKey } from '../constants';
 
 export interface GetMessagesResult extends PageInfo {
     messages: Message[];
@@ -68,7 +68,7 @@ export class SocialsClient extends RequestClient {
             ...auth,
             toAccountID: accountID,
             subject: base64Encode(subject),
-            body: base64Encode(xor(body, KEYS.MESSAGES)),
+            body: base64Encode(xor(body, CryptKey.MESSAGES)),
         });
 
         return data;

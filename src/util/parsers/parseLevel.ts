@@ -1,5 +1,5 @@
 import type { Client } from '../../Client';
-import { KEYS } from '../../constants';
+import { CryptKey } from '../../constants';
 import { Level } from '../../structures';
 import { base64Decode, robTopSplit, xor } from '..';
 import { LevelLength } from '../../enums';
@@ -73,7 +73,7 @@ export function parseLevel(client: Client, str: string): Level {
 
     let password: string | undefined = undefined;
     if (raw.has('27')) {
-        const p = xor(base64Decode(raw.get('27')!).toString(), KEYS.LEVEL_PASSWORD);
+        const p = xor(base64Decode(raw.get('27')!).toString(), CryptKey.LEVEL_PASSWORD);
         if (p.toString().length != 1) password = p.slice(1);
         else password = p;
     }

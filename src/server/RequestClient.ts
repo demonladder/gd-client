@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { Base } from '../Base';
-import { DEFAULT_SERVER, SECRETS, VERSIONLESS_ENDPOINTS } from '../constants';
+import { DEFAULT_SERVER, Secret, VERSIONLESS_ENDPOINTS } from '../constants';
 import { Client } from '../Client';
 import { Account } from '../Account';
 import { AuthCredentials } from '../interfaces/AuthCredentials';
@@ -54,7 +54,7 @@ export class RequestClient extends Base {
         const { server = DEFAULT_SERVER, ...bodyOptions } = options ?? {};
 
         const requestData: Record<string, string | number> = {
-            secret: bodyOptions.secret ?? SECRETS.COMMON,
+            secret: bodyOptions.secret ?? Secret.COMMON,
             gdw: 0,
             ...paramsInternal,
             ...bodyOptions,
@@ -100,7 +100,7 @@ export class RequestClient extends Base {
         options?: RequestOptions,
     ): Promise<T> {
         return this.baseRequest(endpoint, paramsInternal, {
-            secret: SECRETS.ACCOUNT,
+            secret: Secret.ACCOUNT,
             ...options,
         });
     }

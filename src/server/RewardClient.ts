@@ -1,7 +1,7 @@
 import { Client } from '../Client';
 import { RequestClient } from './RequestClient';
 import { base64Decode, base64Encode, generateRandomString, getRandomNumber, sha1, xor } from '../util';
-import { KEYS, SALTS } from '../constants';
+import { CryptKey, Salt } from '../constants';
 
 export interface GetRewardResult {
     randomString1: string;
@@ -89,7 +89,7 @@ export class RewardClient extends RequestClient {
         const { auth, account } = this.requireAuth('get rewards');
 
         const data = await this.baseRequest('getRewards', {
-            chk: generateRewardChk(KEYS.CHEST_REWARDS),
+            chk: generateRewardChk(CryptKey.CHEST_REWARDS),
             rewardType: type,
             r1: getRandomNumber(100, 99999),
             r2: getRandomNumber(100, 99999),
@@ -97,7 +97,11 @@ export class RewardClient extends RequestClient {
             ...auth,
         });
 
-        const { startString, info, hash, isHashValid } = decodeRewardResponse(data, KEYS.CHEST_REWARDS, SALTS.REWARDS);
+        const { startString, info, hash, isHashValid } = decodeRewardResponse(
+            data,
+            CryptKey.CHEST_REWARDS,
+            Salt.REWARDS,
+        );
         const small = info[6].split(',');
         const big = info[9].split(',');
 
@@ -138,12 +142,16 @@ export class RewardClient extends RequestClient {
         const { auth, account } = this.requireAuth('get challenges');
 
         const data = await this.baseRequest('getChallenges', {
-            chk: generateRewardChk(KEYS.CHALLENGES),
+            chk: generateRewardChk(CryptKey.CHALLENGES),
             udid: account.udid,
             ...auth,
         });
 
-        const { startString, info, hash, isHashValid } = decodeRewardResponse(data, KEYS.CHALLENGES, SALTS.CHALLENGES);
+        const { startString, info, hash, isHashValid } = decodeRewardResponse(
+            data,
+            CryptKey.CHALLENGES,
+            Salt.CHALLENGES,
+        );
 
         return {
             randomString1: startString,

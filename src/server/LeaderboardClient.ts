@@ -4,7 +4,7 @@ import { RequestClient } from './RequestClient';
 import { LeaderboardType, LevelLeaderboardType } from '../enums';
 import { base64Encode, chk, generatePlatformerLeaderboardSeed, generateRandomString, xor } from '../util';
 import { parseLeaderboardRecords, parseUser } from '../util/parsers';
-import { KEYS, SALTS } from '../constants';
+import { CryptKey, Salt } from '../constants';
 
 export class LeaderboardClient extends RequestClient {
     public constructor(client: Client) {
@@ -102,7 +102,7 @@ export class LeaderboardClient extends RequestClient {
             opts.coins ?? 0,
             opts.timelyID ?? 0,
         ];
-        const _chk = chk(values, KEYS.LEVEL_LEADERBOARD, SALTS.LEVEL_LEADERBOARDS + s7);
+        const _chk = chk(values, CryptKey.LEVEL_LEADERBOARD, Salt.LEVEL_LEADERBOARDS + s7);
         const percentage = opts.percentage ?? 0;
         if (s6 == '0') s6 = percentage.toString();
 
@@ -117,7 +117,7 @@ export class LeaderboardClient extends RequestClient {
             s3,
             s4: s4 + 1482,
             s5: 2000 + Math.floor(Math.random() * 1999),
-            s6: base64Encode(xor(s6, KEYS.LEVEL)),
+            s6: base64Encode(xor(s6, CryptKey.LEVEL)),
             s7,
             s8: opts.attempts ?? 0,
             s9,

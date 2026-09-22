@@ -1,28 +1,28 @@
-export const SECRETS = {
-    COMMON: 'Wmfd2893gb7',
-    ACCOUNT: 'Wmfv3899gc9',
-    DELETE: 'Wmfv2898gc9',
-    MOD: 'Wmfp3879gc3',
-    ADMIN: 'Wmfx2878gb9',
-};
+export enum Secret {
+    COMMON = 'Wmfd2893gb7',
+    ACCOUNT = 'Wmfv3899gc9',
+    DELETE = 'Wmfv2898gc9',
+    MOD = 'Wmfp3879gc3',
+    ADMIN = 'Wmfx2878gb9',
+}
 
 export const LIBRARY_SECRET = '8501f9c2-75ba-4230-8188-51037c4da102';
 
-export const KEYS = {
-    SAVE_DATA: '\x0B',
-    MESSAGES: '14251',
-    VAULT_CODES: '19283',
-    CHALLENGES: '19847',
-    LEVEL_PASSWORD: '26364',
-    COMMENT: '29481',
-    ACCOUNT_PASSWORD: '37526',
-    LEVEL_LEADERBOARD: '39673',
-    LEVEL: '41274',
-    LOAD_DATA: '48291',
-    RATE: '58281',
-    CHEST_REWARDS: '59182',
-    STAT_SUBMISSION: '85271',
-};
+export enum CryptKey {
+    SAVE_DATA = '\x0B',
+    MESSAGES = '14251',
+    VAULT_CODES = '19283',
+    CHALLENGES = '19847',
+    LEVEL_PASSWORD = '26364',
+    COMMENT = '29481',
+    ACCOUNT_PASSWORD = '37526',
+    LEVEL_LEADERBOARD = '39673',
+    LEVEL = '41274',
+    LOAD_DATA = '48291',
+    RATE = '58281',
+    CHEST_REWARDS = '59182',
+    STAT_SUBMISSION = '85271',
+}
 
 export const LENGTHS = {
     0: 'TINY',
@@ -37,7 +37,7 @@ export const LENGTHS = {
     LONG: 3,
     XL: 4,
     PLATFORMER: 5,
-};
+} as const;
 
 export const ICON_TYPES = {
     0: 'CUBE',
@@ -62,20 +62,20 @@ export const ICON_TYPES = {
     SWING: 7,
     SWINGCOPTER: 7,
     JETPACK: 8,
-};
+} as const;
 
 export const LISTS_HASH = 'f5da5823d94bbe7208dd83a30ff427c7d88fdb99'; // sha-1 of xI25fpAapCQg (SALTS.LEVEL)
 
-export const SALTS = {
-    LEVEL: 'xI25fpAapCQg',
-    COMMENT: 'xPT6iUrtws0J',
-    GJP2: 'mI29fmAnxgTs',
-    STAT_SUBMISSION: 'xI35fsAapCRg',
-    LIKE_OR_RATE: 'ysg6pUrtjn0J',
-    LEVEL_LEADERBOARDS: 'yPg6pUrtWn0J',
-    REWARDS: 'pC26fpYaQCtg',
-    CHALLENGES: 'oC36fpYaPtdg',
-};
+export enum Salt {
+    LEVEL = 'xI25fpAapCQg',
+    COMMENT = 'xPT6iUrtws0J',
+    GJP2 = 'mI29fmAnxgTs',
+    STAT_SUBMISSION = 'xI35fsAapCRg',
+    LIKE_OR_RATE = 'ysg6pUrtjn0J',
+    LEVEL_LEADERBOARDS = 'yPg6pUrtWn0J',
+    REWARDS = 'pC26fpYaQCtg',
+    CHALLENGES = 'oC36fpYaPtdg',
+}
 
 export enum DefaultEndpoints {
     getLevels = 'getGJLevels21.php',
@@ -147,13 +147,13 @@ export const DEFAULT_HEADERS_22 = {
     'Content-Type': 'application/x-www-form-urlencoded',
     Cookie: 'gd=1;',
     Host: 'www.boomlings.com',
-};
+} as const;
 
 export const DEFAULT_HEADERS_21 = {
     'User-Agent': '',
     Accept: '*/*',
     'Content-Type': 'application/x-www-form-urlencoded',
-};
+} as const;
 
 export const RS_CHARACTERS = 'QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm1234567890'.split('');
 
@@ -164,16 +164,16 @@ export const DEFAULT_SERVER_21 = 'http://www.boomlings.com/database';
 export const DEFAULT_ACCOUNT_URL = 'https://www.robtopgames.org/database';
 export const DEFAULT_CONTENT_URL = 'https://geometrydashfiles.b-cdn.net';
 
-export const ITEMS = {
-    FIRE: 1,
-    ICE: 2,
-    POISON: 3,
-    SHADOW: 4,
-    LAVA: 5,
-    KEY: 6,
-    EARTH: 10,
-    BLOOD: 11,
-    METAL: 12,
-    LIGHT: 13,
-    SOUL: 14,
-};
+export enum Item {
+    FIRE = 1,
+    ICE = 2,
+    POISON = 3,
+    SHADOW = 4,
+    LAVA = 5,
+    KEY = 6,
+    EARTH = 10,
+    BLOOD = 11,
+    METAL = 12,
+    LIGHT = 13,
+    SOUL = 14,
+}

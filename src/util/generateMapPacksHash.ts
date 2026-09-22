@@ -1,4 +1,4 @@
-import { SALTS } from '../constants';
+import { Salt } from '../constants';
 import type { MapPack } from '../types/MapPack';
 import { sha1 } from '.';
 
@@ -8,5 +8,5 @@ export function generateMapPacksHash(packs: MapPack[]) {
         const id = pack.id.toString();
         hash += id[0] + id[id.length - 1] + pack.stars.toString() + pack.coins.toString();
     }
-    return sha1(hash + SALTS.LEVEL);
+    return sha1(hash + Salt.LEVEL);
 }

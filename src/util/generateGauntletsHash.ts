@@ -1,4 +1,4 @@
-import { SALTS } from '../constants';
+import { Salt } from '../constants';
 import type { GauntletPack } from '../server/LevelClient';
 import { sha1 } from '.';
 
@@ -9,5 +9,5 @@ export function generateGauntletsHash(packs: GauntletPack[]) {
         hash += pack.ID.toString() + pack.levelIDs.join(',');
     }
 
-    return sha1(hash + SALTS.LEVEL);
+    return sha1(hash + Salt.LEVEL);
 }

@@ -5,7 +5,7 @@ import { PaginationOptions } from '../interfaces/PaginationOptions';
 import { RequestClient } from './RequestClient';
 import { Comment, Post } from '../structures';
 import { parsePageInfo } from '../util/parsers';
-import { KEYS, SALTS } from '../constants';
+import { CryptKey, Salt } from '../constants';
 
 export interface CommentResult extends PageInfo {
     comments: Comment[];
@@ -60,7 +60,7 @@ export class CommentClient extends RequestClient {
             ...(account.username
                 ? {
                       userName: account.username,
-                      chk: chk([account.username, base64Encode(content), 0, 0, 1], KEYS.COMMENT, SALTS.COMMENT),
+                      chk: chk([account.username, base64Encode(content), 0, 0, 1], CryptKey.COMMENT, Salt.COMMENT),
                   }
                 : {}),
         });
@@ -85,8 +85,8 @@ export class CommentClient extends RequestClient {
         const { auth, account } = this.requireAuth('upload a comment');
         const chkThing = chk(
             [account.username, base64Encode(content), levelID, percent, 0],
-            KEYS.COMMENT,
-            SALTS.COMMENT,
+            CryptKey.COMMENT,
+            Salt.COMMENT,
         );
 
         return await this.baseRequest('uploadComment', {

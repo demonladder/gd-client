@@ -2,7 +2,7 @@ import { Client } from '../Client';
 import { RequestClient } from './RequestClient';
 import { parsePageInfo, parseUser } from '../util/parsers';
 import { chk, generateRandomString } from '../util';
-import { KEYS, SALTS } from '../constants';
+import { CryptKey, Salt } from '../constants';
 
 /**
  * Updates your account stats.
@@ -212,8 +212,8 @@ export class UserClient extends RequestClient {
                     opt.completedDailies,
                     opt.completedGauntletNonDemons,
                 ],
-                KEYS.STAT_SUBMISSION,
-                SALTS.STAT_SUBMISSION,
+                CryptKey.STAT_SUBMISSION,
+                Salt.STAT_SUBMISSION,
             ),
         });
 

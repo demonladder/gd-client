@@ -1,5 +1,5 @@
 import { robTopSplit, base64Decode, xor } from '..';
-import { KEYS } from '../../constants';
+import { CryptKey } from '../../constants';
 
 const messageNumberKeys = {
     1: 'id',
@@ -40,7 +40,7 @@ export function parseMessage(str: string): Message {
             message[i[1]] = raw.get(i[0].toString()) ? !!Number(raw.get(i[0].toString())) : false;
     }
     if (raw.get('4')) message.title = base64Decode(raw.get('4')!);
-    if (raw.get('5')) message.content = xor(base64Decode(raw.get('5')!), KEYS.MESSAGES);
+    if (raw.get('5')) message.content = xor(base64Decode(raw.get('5')!), CryptKey.MESSAGES);
 
     // for (const i of raw.keys()) {
     //     if (!messageBoolKeys[i] && !messageStringKeys[i] && !messageNumberKeys[i]) {

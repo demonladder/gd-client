@@ -2,7 +2,7 @@ import { Client } from '../Client';
 import { RequestClient } from './RequestClient';
 import { ContentType } from '../enums';
 import { chk, generateRandomString } from '../util';
-import { KEYS, SALTS } from '../constants';
+import { CryptKey, Salt } from '../constants';
 
 export class LikeClient extends RequestClient {
     public constructor(client: Client) {
@@ -15,8 +15,8 @@ export class LikeClient extends RequestClient {
         const randomString = generateRandomString(10);
         const chkThing = chk(
             [special, itemID, like, type, randomString, auth.accountID, account.udid, account.playerID],
-            KEYS.RATE,
-            SALTS.LIKE_OR_RATE,
+            CryptKey.RATE,
+            Salt.LIKE_OR_RATE,
         );
 
         return await this.baseRequest('likeItem', {
